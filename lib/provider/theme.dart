@@ -23,22 +23,27 @@ class ThemeProvider extends ChangeNotifier {
 class ThemePack {
   static final dark = ThemeData(
     useMaterial3: true,
-    scaffoldBackgroundColor: Colors.grey[1000],
+    // scaffoldBackgroundColor: Colors.grey[1000],
     primaryColor: Colors.white,
     textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold, ),
+      bodyMedium: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
       labelSmall: TextStyle(color: Colors.white, fontSize: 15.0, height: 0),
       labelMedium: TextStyle(color: Colors.white, fontSize: 20.0, height: 0),
       labelLarge: TextStyle(color: Colors.white, fontSize: 25.0, height: 0),
-      titleLarge: TextStyle(color: Colors.white, fontSize: 40.0, height: 0),
+      titleLarge: TextStyle(color: Colors.white, fontSize: 40.0, height: 0, fontWeight: FontWeight.bold),
       titleMedium: TextStyle(color: Colors.white, fontSize: 30, height: 0),
       titleSmall: TextStyle(color: Colors.white, fontSize: 25, height: 0),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      fillColor: Colors.grey.shade800,
+      filled: true,
+      isCollapsed: true,
+      fillColor: const Color.fromRGBO(28, 28, 31, 1),
+      contentPadding: const EdgeInsets.all(10),
+      hintStyle: const TextStyle(fontSize: 18),
+      labelStyle: const TextStyle(color: Colors.white, fontSize: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(15),
-        borderSide: const BorderSide(color: Colors.green),
+        borderSide: const BorderSide(color: Colors.blue),
       )
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -50,12 +55,13 @@ class ThemePack {
       primary: Colors.white, // The color displayed most frequently across your app’s screens and components. (Floating button)
       onPrimary: Colors.white, // A color that's clearly legible when drawn on primary. (App bar)
       onBackground: Colors.white,
-      surface: Colors.green, // Status bar
+      surface: Colors.blue, // Status bar
       onSurface: Colors.white, // Icons color
       error: Colors.grey.shade300, 
       onError: Colors.grey.shade300, 
-      secondary: Colors.green, 
-      onSecondary: Colors.green
+      secondary: Colors.blue, 
+      onSecondary: Colors.blue,
+      primaryContainer: const Color.fromRGBO(28, 28, 30, 1)
     ),
     listTileTheme: ListTileThemeData(
       iconColor: Colors.white,
@@ -70,6 +76,69 @@ class ThemePack {
         backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)
       )
     )
+  );
+
+  static final light = ThemeData(
+    useMaterial3: true,
+    primaryColor: Colors.black,
+    scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.black),
+      bodySmall: TextStyle(color: Colors.black),
+      bodyMedium: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
+      labelSmall: TextStyle(color: Colors.black, fontSize: 15.0, height: 0),
+      labelMedium: TextStyle(color: Colors.black, fontSize: 20.0, height: 0),
+      labelLarge: TextStyle(color: Colors.black, fontSize: 25.0, height: 0),
+      titleLarge: TextStyle(color: Colors.black, fontSize: 40.0, height: 0, fontWeight: FontWeight.bold),
+      titleMedium: TextStyle(color: Colors.black, fontSize: 30, height: 0),
+      titleSmall: TextStyle(color: Colors.black, fontSize: 25, height: 0),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      isCollapsed: true,
+      fillColor: const Color.fromRGBO(227, 227, 233, 1),
+      hintStyle: const TextStyle(color: Colors.grey,fontSize: 18),
+      labelStyle: const TextStyle(color: Colors.black, fontSize: 18),
+      contentPadding: const EdgeInsets.all(10),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: const BorderSide(color: Colors.blue),
+      ),
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: Colors.grey.shade200 
+    ),
+    colorScheme: const ColorScheme(
+      brightness: Brightness.dark, // The overall brightness of this color scheme.
+      background: Color.fromRGBO(242, 242, 247, 1), // A color that typically appears behind scrollable content.
+      primary: Colors.black, // The color displayed most frequently across your app’s screens and components. (Floating button)
+      onPrimary: Colors.black, // A color that's clearly legible when drawn on primary. (App bar)
+      onBackground: Colors.black,
+      surface: Colors.blue, // Status bar
+      onSurface: Colors.black, // Icons color
+      error: Color.fromRGBO(242, 242, 247, 1), 
+      onError: Color.fromRGBO(242, 242, 247, 1), 
+      secondary: Colors.blue, 
+      onSecondary: Colors.blue,
+      primaryContainer: Colors.white
+    ),
+    listTileTheme: ListTileThemeData(
+      iconColor: Colors.black,
+      tileColor: Colors.white,
+      shape: RoundedRectangleBorder( //<-- SEE HERE
+        borderRadius: BorderRadius.circular(10)
+      )
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      textStyle: const TextStyle(fontSize: 18),
+      menuStyle: MenuStyle(
+        backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)
+      )
+    ),
+    iconTheme: const IconThemeData(
+      color: Colors.black
+    )
+    
   );
 
 }

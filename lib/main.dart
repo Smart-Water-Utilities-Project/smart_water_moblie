@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_water_moblie/pages/summary.dart';
+
 import 'package:smart_water_moblie/provider/theme.dart';
+import 'package:smart_water_moblie/page/summary/summary.dart';
 
 ThemeProvider themeProvider = ThemeProvider();
 
-void main() {
+void main() async {
+  await themeProvider.fetch();
   runApp(const MyApp());
 
   startDemoMode();
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Flutter Demo',
           home: const SummaryPage(),
-          theme: ThemePack.dark,
+          theme: ThemePack.light,
           darkTheme: ThemePack.dark,
           themeMode: themeProvider.theme,
           debugShowCheckedModeBanner: false,
