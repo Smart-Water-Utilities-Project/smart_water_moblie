@@ -7,6 +7,8 @@ import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'dart:async';
 import 'dart:math';
 
+import 'package:smart_water_moblie/page/waterflow/waterflow.dart';
+
 class CounterModel with ChangeNotifier {
   double value = 0;
   double get count => value;
@@ -57,8 +59,10 @@ class _SummaryPageState extends State<SummaryPage> {
               textStyle: themeData.textTheme.titleLarge
             ),
             const Text(" 公升/小時", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
-          ]
-        )
+          ],
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (contxt) => WaterflowPage()))
+        ),
+        
       ),
 
       ListenableBuilder(
