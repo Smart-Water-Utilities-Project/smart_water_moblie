@@ -141,6 +141,20 @@ class _SummaryPageState extends State<SummaryPage> {
             const Text(" 公升", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
           ]
         )
+      ),
+
+      const InfoCard(
+        title: '全部資料',
+        color: Colors.yellow,
+        icon: SizedBox(
+          width: 30, height: 50,
+          child: Icon(
+            size: 30,
+            Icons.water_damage,
+            color: Colors.yellow,
+          )
+        ),
+        textSpan: []
       )
     ];
 

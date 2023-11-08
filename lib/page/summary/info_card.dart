@@ -23,6 +23,7 @@ class InfoCard extends StatefulWidget {
 class _InfoCardState extends State<InfoCard> {
   @override
   Widget build(BuildContext context) {
+    final textLength = widget.textSpan.length;
     return ListTile(
       titleAlignment: ListTileTitleAlignment.top,
       visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
@@ -32,16 +33,16 @@ class _InfoCardState extends State<InfoCard> {
       ),
       leading: widget.icon,
       title: Text(widget.title,
-          style: TextStyle(fontSize: 20, color: widget.color)),
+        style: TextStyle(fontSize: 20, color: widget.color)),
       trailing: Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child:
-              Icon(size: 20, Icons.arrow_forward_ios, color: widget.color)),
+        padding: EdgeInsets.only(top: textLength==0 ? 10 : 5),
+        child: Icon(size: 20, Icons.arrow_forward_ios, color: widget.color)),
       subtitle: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: widget.textSpan,
       ),
-      onTap: widget.onTap);
+      onTap: widget.onTap
+    );
   }
 }
