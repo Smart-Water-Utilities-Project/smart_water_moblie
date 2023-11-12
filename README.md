@@ -1,16 +1,10 @@
-# smart_water_moblie
+# 居家智慧用水
 
-A new Flutter project.
+## 入門
+我們的專題，要做不玩了放火!
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 待辦事項
+- [ ] 詳細資料頁面下方的資訊卡
+- [ ] 各項資料轉為圖表顯示的函數
+- [ ] 等待Server端實現JSON資料傳輸功能
+- [ ] 等待Server端實現即時資料傳輸功能
