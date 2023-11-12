@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:smart_water_moblie/page/settings/themeSection.dart';
-import 'package:smart_water_moblie/page/settings/serverSection.dart';
-
+import 'package:smart_water_moblie/page/settings/theme_section.dart';
+import 'package:smart_water_moblie/page/settings/server_section.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

@@ -1,12 +1,12 @@
+import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
+
+import 'package:animated_flip_counter/animated_flip_counter.dart';
+import 'package:flutter/services.dart';
 
 import 'package:smart_water_moblie/page/settings/settings.dart';
 import 'package:smart_water_moblie/page/summary/info_card.dart';
-import 'package:animated_flip_counter/animated_flip_counter.dart';
-
-import 'dart:async';
-import 'dart:math';
-
 import 'package:smart_water_moblie/page/waterflow/waterflow.dart';
 
 class CounterModel with ChangeNotifier {
@@ -66,7 +66,7 @@ class _SummaryPageState extends State<SummaryPage> {
       ),
 
       ListenableBuilder(
-        listenable: flowController,
+        listenable: tempController,
         builder:(context, child) => InfoCard(
           title: '水溫',
           color: Colors.orange.shade700,
@@ -92,7 +92,7 @@ class _SummaryPageState extends State<SummaryPage> {
       ),
       
       ListenableBuilder(
-        listenable: flowController,
+        listenable: sumController,
         builder:(context, child) => InfoCard(
           title: '本月累計用水',
           color: Colors.green.shade700,
@@ -172,7 +172,7 @@ class _SummaryPageState extends State<SummaryPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('即時資訊', style: TextStyle(fontSize: 40)),
+                    Text('即時資訊', style: themeData.textTheme.titleLarge),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.settings, size: 35),

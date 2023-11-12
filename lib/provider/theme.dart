@@ -26,13 +26,15 @@ class ThemePack {
     // scaffoldBackgroundColor: Colors.grey[1000],
     primaryColor: Colors.white,
     textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
-      labelSmall: TextStyle(color: Colors.white, fontSize: 15.0, height: 0),
-      labelMedium: TextStyle(color: Colors.white, fontSize: 20.0, height: 0),
-      labelLarge: TextStyle(color: Colors.white, fontSize: 25.0, height: 0),
-      titleLarge: TextStyle(color: Colors.white, fontSize: 40.0, height: 0, fontWeight: FontWeight.bold),
-      titleMedium: TextStyle(color: Colors.white, fontSize: 30, height: 0),
-      titleSmall: TextStyle(color: Colors.white, fontSize: 25, height: 0),
+      bodySmall: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white, fontSize: 19),
+      bodyLarge: TextStyle(color: Colors.white, fontSize: 25),
+      labelSmall: TextStyle(color: Colors.white),
+      labelMedium: TextStyle(color: Colors.white, fontSize: 19),
+      labelLarge: TextStyle(color: Colors.white, fontSize: 25),
+      titleSmall: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+      titleMedium: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.bold),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -75,6 +77,16 @@ class ThemePack {
       menuStyle: MenuStyle(
         backgroundColor: MaterialStatePropertyAll(Colors.grey.shade900)
       )
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(
+          Colors.blue
+        ),
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 10)
+        )
+      )
     )
   );
 
@@ -83,15 +95,15 @@ class ThemePack {
     primaryColor: Colors.black,
     scaffoldBackgroundColor: const Color.fromRGBO(242, 242, 247, 1),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.black),
       bodySmall: TextStyle(color: Colors.black),
-      bodyMedium: TextStyle(color: Colors.black, fontSize: 25, fontWeight: FontWeight.bold),
-      labelSmall: TextStyle(color: Colors.black, fontSize: 15.0, height: 0),
-      labelMedium: TextStyle(color: Colors.black, fontSize: 20.0, height: 0),
-      labelLarge: TextStyle(color: Colors.black, fontSize: 25.0, height: 0),
-      titleLarge: TextStyle(color: Colors.black, fontSize: 40.0, height: 0, fontWeight: FontWeight.bold),
-      titleMedium: TextStyle(color: Colors.black, fontSize: 30, height: 0),
-      titleSmall: TextStyle(color: Colors.black, fontSize: 25, height: 0),
+      bodyMedium: TextStyle(color: Colors.black, fontSize: 19),
+      bodyLarge: TextStyle(color: Colors.black, fontSize: 25),
+      labelSmall: TextStyle(color: Colors.black),
+      labelMedium: TextStyle(color: Colors.black, fontSize: 19),
+      labelLarge: TextStyle(color: Colors.black, fontSize: 25),
+      titleSmall: TextStyle(color: Colors.black, fontSize: 17, fontWeight: FontWeight.bold),
+      titleMedium: TextStyle(color: Colors.black, fontSize: 28, fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(color: Colors.black, fontSize: 34, fontWeight: FontWeight.bold),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -137,8 +149,17 @@ class ThemePack {
     ),
     iconTheme: const IconThemeData(
       color: Colors.black
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(
+          Colors.blue
+        ),
+        padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 10)
+        )
+      )
     )
-    
   );
 
 }

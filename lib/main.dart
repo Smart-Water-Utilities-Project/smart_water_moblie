@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         final themeProvider = Provider.of<ThemeProvider>(context);
         
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: '智慧用水',
           home: const SummaryPage(),
           theme: ThemePack.light,
           darkTheme: ThemePack.dark,
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           builder: (context, child) {
             final mediaQueryData = MediaQuery.of(context);
             return MediaQuery(
-              data: mediaQueryData.copyWith(textScaleFactor: 1),
+              data: mediaQueryData,
               child: child!,
             );
           }

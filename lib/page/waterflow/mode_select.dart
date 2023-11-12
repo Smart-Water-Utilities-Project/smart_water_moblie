@@ -21,7 +21,7 @@ class ModeSwitchState extends State<ModeSwitch> {
   @override
   void initState() {
     super.initState();
-    selected = ShowType.hour;
+    selected = ShowType.day;
   }
 
   @override
@@ -40,10 +40,6 @@ class ModeSwitchState extends State<ModeSwitch> {
         thumbColor: theme.colorScheme.secondary,
         backgroundColor: theme.inputDecorationTheme.fillColor!,
         children: const <ShowType, Widget>{
-          ShowType.hour: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: Text('小時', style: labelStyle)
-          ),
           ShowType.day: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Text('今天', style: labelStyle)

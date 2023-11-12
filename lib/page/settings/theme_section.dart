@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_water_moblie/provider/theme.dart';
-import 'package:smart_water_moblie/page/settings/settings.dart';
-
 
 class ThemeSection extends StatefulWidget {
   const ThemeSection({super.key});
@@ -165,8 +163,10 @@ class ThemeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 5 ,5 ,5),
+      padding: EdgeInsets.fromLTRB(mediaQuery.size.width / 60, 2, mediaQuery.size.width / 60 ,2),
       decoration: BoxDecoration(
         color: themeData.scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(10),
@@ -176,10 +176,15 @@ class ThemeIcon extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text("Aa", style: themeData.textTheme.titleLarge),
+              Text("Aa", 
+                style: themeData.textTheme.titleLarge!.copyWith(
+                  fontSize: mediaQuery.size.width / 11.32500
+                )
+              ),
               const Spacer(),
               Container(
-                height: 40, width: 40,
+                width: mediaQuery.size.width / 11.32500,
+                height: mediaQuery.size.width / 11.32500, 
                 margin: const EdgeInsets.only(bottom: 5),
                 decoration: BoxDecoration(
                   color: themeData.colorScheme.surface,
@@ -189,23 +194,27 @@ class ThemeIcon extends StatelessWidget {
             ],
           ),
           Container(
-            height: 5,
-            margin: const EdgeInsets.only(bottom: 5),
+            height: mediaQuery.size.width / 90.6,
+            margin: EdgeInsets.only(
+              bottom: mediaQuery.size.width / 90.6
+            ),
             decoration: BoxDecoration(
               color: themeData.colorScheme.primary,
               borderRadius: BorderRadius.circular(10)
             )
           ),
           Container(
-            height: 5,
-            margin: const EdgeInsets.only(bottom: 5),
+            height: mediaQuery.size.width / 90.6,
+            margin: EdgeInsets.only(
+              bottom: mediaQuery.size.width / 90.6
+            ),
             decoration: BoxDecoration(
               color: themeData.colorScheme.primary,
               borderRadius: BorderRadius.circular(10)
             )
           ),
           Container(
-            height: 5,
+            height: mediaQuery.size.width / 90.6,
             decoration: BoxDecoration(
               color: themeData.colorScheme.primary,
               borderRadius: BorderRadius.circular(10)
@@ -213,7 +222,11 @@ class ThemeIcon extends StatelessWidget {
           ),
           Expanded(
             child: Center(
-              child: Text(title, style: themeData.textTheme.labelLarge),
+              child: Text(title, 
+                style: themeData.textTheme.labelLarge!.copyWith(
+                  fontSize: mediaQuery.size.width / 18.12
+                )
+              ),
             )
           )
         ],
