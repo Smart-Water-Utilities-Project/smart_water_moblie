@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_water_moblie/provider/theme.dart';
@@ -163,74 +164,70 @@ class ThemeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    final mediaQuery = MediaQuery.of(context);
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(mediaQuery.size.width / 60, 2, mediaQuery.size.width / 60 ,2),
-      decoration: BoxDecoration(
-        color: themeData.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxHeight = constraints.maxHeight;
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: themeData.scaffoldBackgroundColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Aa", 
-                style: themeData.textTheme.titleLarge!.copyWith(
-                  fontSize: mediaQuery.size.width / 11.32500
+              Row(
+                children: [
+                  Text("Aa", style: TextStyle(
+                    fontSize: maxHeight / 3.0415,
+                    color: themeData.textTheme.titleLarge!.color,
+                  )),
+                  const Spacer(),
+                  Container(
+                    height: maxHeight / 3.0415, width: maxHeight / 3.0415,
+                    margin: const EdgeInsets.only(bottom: 5),
+                    decoration: BoxDecoration(
+                      color: themeData.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(10)
+                    )
+                  )
+                ],
+              ),
+              Container(
+                height: maxHeight / 24.332,
+                margin: EdgeInsets.only(bottom: maxHeight / 24.332),
+                decoration: BoxDecoration(
+                  color: themeData.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10)
                 )
               ),
-              const Spacer(),
               Container(
-                width: mediaQuery.size.width / 11.32500,
-                height: mediaQuery.size.width / 11.32500, 
-                margin: const EdgeInsets.only(bottom: 5),
+                height: maxHeight / 24.332,
+                margin: EdgeInsets.only(bottom: maxHeight / 24.332),
                 decoration: BoxDecoration(
-                  color: themeData.colorScheme.surface,
+                  color: themeData.colorScheme.primary,
                   borderRadius: BorderRadius.circular(10)
+                )
+              ),
+              Container(
+                height: maxHeight / 24.332,
+                decoration: BoxDecoration(
+                  color: themeData.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10)
+                )
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(title, style: TextStyle(
+                    fontSize: maxHeight / 4.8664,
+                    color: themeData.textTheme.labelLarge!.color,
+                  ))
                 )
               )
             ],
-          ),
-          Container(
-            height: mediaQuery.size.width / 90.6,
-            margin: EdgeInsets.only(
-              bottom: mediaQuery.size.width / 90.6
-            ),
-            decoration: BoxDecoration(
-              color: themeData.colorScheme.primary,
-              borderRadius: BorderRadius.circular(10)
-            )
-          ),
-          Container(
-            height: mediaQuery.size.width / 90.6,
-            margin: EdgeInsets.only(
-              bottom: mediaQuery.size.width / 90.6
-            ),
-            decoration: BoxDecoration(
-              color: themeData.colorScheme.primary,
-              borderRadius: BorderRadius.circular(10)
-            )
-          ),
-          Container(
-            height: mediaQuery.size.width / 90.6,
-            decoration: BoxDecoration(
-              color: themeData.colorScheme.primary,
-              borderRadius: BorderRadius.circular(10)
-            )
-          ),
-          Expanded(
-            child: Center(
-              child: Text(title, 
-                style: themeData.textTheme.labelLarge!.copyWith(
-                  fontSize: mediaQuery.size.width / 18.12
-                )
-              ),
-            )
           )
-        ],
-      )
+        );
+      }
     );
   }
 }

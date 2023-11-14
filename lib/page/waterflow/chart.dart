@@ -109,7 +109,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
     return <ColumnSeries<SensorDataPack, String>>[
       ColumnSeries<SensorDataPack, String>(
         dataSource: widget.data,
-        xValueMapper: (SensorDataPack data, _) => SensorDataParser.displayLabel(widget.data[data.xIndex-1], ShowType.day) ,
+        xValueMapper: (SensorDataPack data, _) => SensorDataParser.displayLabel(widget.data[data.xIndex], ShowType.day) ,
         yValueMapper: (SensorDataPack data, _) => data.waterflow,
         pointColorMapper: (SensorDataPack data, _) => Colors.red,
         borderRadius: const BorderRadius.only(

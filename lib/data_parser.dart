@@ -19,16 +19,17 @@ class SensorDataParser {
 
     // List < Hours, Waterflow, start_TS, end_TS>
     final allNumbers = List<(int, double, DateTime?, DateTime?)>
-      .generate(24, (i) => (i + 1, 0.0, null, null));
+      .generate(23, (i) => (i, 0.0, null, null));
 
     data.forEach((decoded) {
       DateTime? setStart, setEnd;
       final ts = DateTime.fromMillisecondsSinceEpoch((decoded["t"] as int) * 60 * 1000);
-      final lastValue = allNumbers[ts.hour - 1];
+      final lastValue = allNumbers[ts.hour];
       
       if (ts.isBefore(lastValue.$3 ?? DateTime.now())) { setStart = ts; }
       if (ts.isAfter(lastValue.$4 ?? DateTime.fromMicrosecondsSinceEpoch(0))) { setEnd = ts; }
-      allNumbers[ts.hour - 1] = (
+      print(ts.hour);
+      allNumbers[ts.hour] = (
         ts.hour, lastValue.$2 + decoded["wf"], setStart, setEnd
       );
     });
