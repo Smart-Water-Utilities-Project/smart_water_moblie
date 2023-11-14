@@ -1,5 +1,4 @@
-import 'dart:math';
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:animated_flip_counter/animated_flip_counter.dart';
@@ -199,13 +198,4 @@ class _SummaryPageState extends State<SummaryPage> {
       )
     );
   }
-}
-
-void startDemoMode() {
-  const oneSec = Duration(milliseconds: 1000);
-  Timer.periodic(oneSec, (Timer t) {
-    sumController.set(sumController.value + 1.3);
-    tempController.set(Random().nextDouble() * 32);
-    flowController.set(Random().nextInt(1000).toDouble());
-  });
 }

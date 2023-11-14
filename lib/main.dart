@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:smart_water_moblie/demomode.dart';
+import 'package:smart_water_moblie/websocket.dart';
 import 'package:smart_water_moblie/provider/theme.dart';
 import 'package:smart_water_moblie/page/summary/summary.dart';
 
@@ -9,8 +11,8 @@ ThemeProvider themeProvider = ThemeProvider();
 void main() async {
   await themeProvider.fetch();
   runApp(const MyApp());
-
-  startDemoMode();
+  wsAPI.connect("192.168.1.110:5678");
+  DemoMode();
 }
 
 class MyApp extends StatelessWidget {

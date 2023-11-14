@@ -50,8 +50,8 @@ class ServerInitialize extends StatefulWidget {
 class _ServerInitializeState extends State<ServerInitialize> {
   String? errorLore;
   ConnectState result = ConnectState.never;
-  final addrTextController = TextEditingController();
-  final portTextController = TextEditingController();
+  final addrTextController = TextEditingController(text: "192.168.1.110");
+  final portTextController = TextEditingController(text: "5678");
   
   void connectWS() async {
     final String addr = addrTextController.value.text;

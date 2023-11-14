@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-enum ShowType {hour, day, week, month}
+enum ShowType {day, week, month}
 
 class ModeSwitch extends StatefulWidget {
   const ModeSwitch({
@@ -12,7 +12,7 @@ class ModeSwitch extends StatefulWidget {
   @override
   State<ModeSwitch> createState() => ModeSwitchState();
 
-  final VoidCallback? onChange;
+  final Function(ShowType?)? onChange;
 }
 
 class ModeSwitchState extends State<ModeSwitch> {
@@ -56,7 +56,7 @@ class ModeSwitchState extends State<ModeSwitch> {
         onValueChanged: (ShowType? value) {
           if (value != null) {
             setState(() {selected = value;});
-            widget.onChange?.call();
+            widget.onChange?.call(value);
           }
         }
       ),

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -6,13 +8,22 @@ enum ConnectState {
   never, successful, failed, connecting
 }
 
+extension DateTimeConvert on DateTime {
+  double toMinutesSinceEpoch() {
+    return millisecondsSinceEpoch / (60 * 1000);
+  }
+}
+
 class WebsocketAPI extends ChangeNotifier{
   WebSocket? client;
   int clientID = -1;
   bool verified = false;
   String? serverAddress;
-  ConnectState _state = ConnectState.never;
   ConnectState get state => _state;
+  ConnectState _state = ConnectState.never;
+
+  static final dataReciever = StreamController<List<dynamic>>();
+  final dataRecieveStream = dataReciever.stream.asBroadcastStream();
 
   Future<String?> connect(String url) async {
     verified = false;
@@ -75,11 +86,25 @@ class WebsocketAPI extends ChangeNotifier{
 
   void onGeneral(Map<String, dynamic> map) {
     switch(map["t"] as String) {
-      case "REQUEST_HISTORY_DATA_ACK":
-        print("request data income");
-        print(map["d"]);
-        break;
+      case "REQUEST_HISTORY_DATA_ACK": {
+        dataReciever.sink.add(map["d"]);
+      }
+
     }
+  }
+
+
+  void getData((DateTime, DateTime) range) async {
+    Map<String, dynamic> uploadData = {
+      "op": 0,
+      "d": {
+        "s": range.$1.toMinutesSinceEpoch().floor(),
+        "e": range.$2.toMinutesSinceEpoch().floor()
+      },
+      "t": "REQUEST_HISTORY_DATA"
+    };
+
+    client?.add(jsonEncode(uploadData));
   }
 
   Future<void> disconnect() async {

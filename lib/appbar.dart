@@ -17,7 +17,6 @@ class GeneralAppBar extends StatelessWidget implements PreferredSizeWidget{
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     
-
     return AppBar(
       elevation: 0,
       centerTitle: true,
