@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class InfoCard extends StatefulWidget {
-  const InfoCard(
-      {super.key,
-      required this.title,
-      required this.icon,
-      required this.textSpan,
-      required this.color,
-      this.onTap
-    }) ;
+  const InfoCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.textSpan,
+    required this.color,
+    this.onTap
+  });
 
   final Widget icon;
   final String title;
@@ -23,13 +23,10 @@ class InfoCard extends StatefulWidget {
 class _InfoCardState extends State<InfoCard> {
   @override
   Widget build(BuildContext context) {
-
-    final textLength = widget.textSpan.length;
     return ListTile(
       titleAlignment: ListTileTitleAlignment.top,
       visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
       shape: RoundedRectangleBorder(
-        //<-- SEE HERE
         borderRadius: BorderRadius.circular(15),
       ),
       leading: widget.icon,

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/appbar.dart';
-import 'package:smart_water_moblie/data_parser.dart';
+import 'package:smart_water_moblie/core/data_parser.dart';
 
-import 'package:smart_water_moblie/websocket.dart';
+import 'package:smart_water_moblie/core/websocket.dart';
 import 'package:smart_water_moblie/page/waterflow/chart.dart';
 import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
 
@@ -22,6 +22,7 @@ class WaterflowPage extends StatefulWidget {
 class _WaterflowPageState extends State<WaterflowPage> {
   List<SensorDataPack> data = [];
   ShowType showType = ShowType.day;
+
   late final ModeSwitch modeSwitch;
   late final StreamSubscription<List<dynamic>> subscription;
 
@@ -31,8 +32,7 @@ class _WaterflowPageState extends State<WaterflowPage> {
       case ShowType.week: data = SensorDataParser.week(event);
       case ShowType.month: data = SensorDataParser.month(event, reqMonth().$2.day);
     }
-    setState(() {});
-    print("[DATA_SET] $event");
+    debugPrint("[DATA_SET] $event");
   });
 
   (DateTime, DateTime) reqDay() {
@@ -68,15 +68,14 @@ class _WaterflowPageState extends State<WaterflowPage> {
     super.initState();
     subscription = wsAPI.dataRecieveStream.listen(setData);
     modeSwitch = ModeSwitch(
-      onChange: (ShowType? event) {
-        showType = event ?? ShowType.day;
+      onChange: (ShowType event) {
+        showType = event;
 
-        switch (event?? ShowType.day) {
+        switch (event) {
           case ShowType.day: wsAPI.getData(reqDay());
           case ShowType.week: wsAPI.getData(reqWeek());
           case ShowType.month: wsAPI.getData(reqMonth());
         }
-        
       }
     );
   }
@@ -117,10 +116,11 @@ class _WaterflowPageState extends State<WaterflowPage> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: widgetList.length,
           itemBuilder:(context, index) => widgetList[index],
-          separatorBuilder:(context, index) => const SizedBox(height: 10)
+          separatorBuilder:(context, index) {
+            return const SizedBox(height: 10);
+          }
         )
       )
     );
   }
 }
-

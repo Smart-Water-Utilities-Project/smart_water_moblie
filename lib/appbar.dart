@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class GeneralAppBar extends StatelessWidget implements PreferredSizeWidget{
+class GeneralAppBar extends StatelessWidget implements PreferredSizeWidget {
   const GeneralAppBar({
     super.key,
     required this.title,
@@ -12,7 +12,6 @@ class GeneralAppBar extends StatelessWidget implements PreferredSizeWidget{
   final String title;
   final AppBar appBar;
   
-
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);

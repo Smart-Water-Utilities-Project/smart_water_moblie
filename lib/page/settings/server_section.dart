@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:smart_water_moblie/websocket.dart';
+import 'package:smart_water_moblie/core/websocket.dart';
 import 'package:smart_water_moblie/page/settings/connect_dialog.dart';
 
 class ServerSection extends StatefulWidget {
@@ -104,11 +104,11 @@ class _DetailBoxState extends State<DetailBox> {
         duration: const Duration(milliseconds: 350),
         padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
         decoration: BoxDecoration(
-          color: (wsAPI.state == ConnectState.successful) ?
+          color: (wsAPI.state == ConnectionStatus.successful) ?
             Colors.green : Colors.red,
           borderRadius: BorderRadius.circular(15)
         ),
-        child: (wsAPI.state == ConnectState.successful) ? 
+        child: (wsAPI.state == ConnectionStatus.successful) ? 
           buildSuccess(constraints) : buildNever(constraints)
       )
     );
@@ -143,17 +143,19 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
     return TextButton(
       onPressed: () {
         final animationController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 200)
-          );
+          vsync: this,
+          duration: const Duration(milliseconds: 200)
+        );
 
-          final dialog = DataViewDialog(
-            context: context,
-            animation: animationController
-          );
-          dialog.show();
+        final dialog = DataViewDialog(
+          context: context,
+          animation: animationController
+        );
+        
+        dialog.show();
       },
-      child: Text("建立連線", 
+      child: Text(
+        "建立連線", 
         style: themeData.textTheme.labelMedium,
       )
     );
@@ -164,7 +166,6 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
     return TextButton(
       onPressed: () async {
         await wsAPI.disconnect();
-        
       },
       child: Text("中斷連線", 
         style: themeData.textTheme.labelMedium,
@@ -174,7 +175,7 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    if (wsAPI.state == ConnectState.successful) {
+    if (wsAPI.state == ConnectionStatus.successful) {
       return buildDisconnect();
     }
     return buildConnect();

@@ -14,6 +14,4 @@ class DemoMode {
       flowController.set(Random().nextInt(1000).toDouble());
     });
   }
-  
 }
-

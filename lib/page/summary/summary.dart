@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 
 import 'package:animated_flip_counter/animated_flip_counter.dart';
-import 'package:flutter/services.dart';
 
 import 'package:smart_water_moblie/page/settings/settings.dart';
 import 'package:smart_water_moblie/page/summary/info_card.dart';
@@ -31,22 +29,22 @@ class SummaryPage extends StatefulWidget {
 }
 
 class _SummaryPageState extends State<SummaryPage> {
-
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    final ThemeData themeData = Theme.of(context);
 
     List<Widget> cardList = [
       ListenableBuilder(
         listenable: flowController,
-        builder:(context, child) => InfoCard(
+        builder: (context, child) => InfoCard(
           title: '流量',
           color: Colors.cyan.shade700,
           icon: SizedBox(
-            width: 30, height: 30,
+            width: 30,
+            height: 30,
             child: Icon(
-              size: 30,
               Icons.water,
+              size: 30,
               color: Colors.cyan.shade700
             )
           ),
@@ -57,20 +55,28 @@ class _SummaryPageState extends State<SummaryPage> {
               duration: const Duration(milliseconds: 600),
               textStyle: themeData.textTheme.titleLarge
             ),
-            const Text(" 公升/小時", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
+            const Text(
+              " 公升/小時",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey
+              )
+            )
           ],
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (contxt) => WaterflowPage()))
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (contxt) => WaterflowPage())
+          )
         ),
-        
       ),
 
       ListenableBuilder(
         listenable: tempController,
-        builder:(context, child) => InfoCard(
+        builder: (context, child) => InfoCard(
           title: '水溫',
           color: Colors.orange.shade700,
           icon: SizedBox(
-            width: 30, height: 30,
+            width: 30,
+            height: 30,
             child: Icon(
               size: 30,
               Icons.thermostat,
@@ -85,18 +91,25 @@ class _SummaryPageState extends State<SummaryPage> {
               duration: const Duration(milliseconds: 600),
               textStyle: themeData.textTheme.titleLarge
             ),
-            const Text(" 攝氏度", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
+            const Text(
+              " 攝氏度",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey
+              )
+            )
           ]
         )
       ),
       
       ListenableBuilder(
         listenable: sumController,
-        builder:(context, child) => InfoCard(
+        builder: (context, child) => InfoCard(
           title: '本月累計用水',
           color: Colors.green.shade700,
           icon: SizedBox(
-            width: 30, height: 30,
+            width: 30,
+            height: 30,
             child: Icon(
               size: 25,
               Icons.calendar_today,
@@ -111,18 +124,25 @@ class _SummaryPageState extends State<SummaryPage> {
               duration: const Duration(milliseconds: 600),
               textStyle: themeData.textTheme.titleLarge
             ),
-            const Text(" 公升", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
+            const Text(
+              " 公升",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey
+              )
+            )
           ]
         )
       ),
 
       ListenableBuilder(
         listenable: flowController,
-        builder:(context, child) => InfoCard(
+        builder: (context, child) => InfoCard(
           title: '水塔儲水量',
           color: Colors.yellow,
           icon: const SizedBox(
-            width: 30, height: 30,
+            width: 30,
+            height: 30,
             child: Icon(
               size: 30,
               Icons.water_damage,
@@ -137,7 +157,13 @@ class _SummaryPageState extends State<SummaryPage> {
               duration: const Duration(milliseconds: 600),
               textStyle: themeData.textTheme.titleLarge
             ),
-            const Text(" 公升", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey))
+            const Text(
+              " 公升",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey
+              )
+            )
           ]
         )
       ),
@@ -146,7 +172,8 @@ class _SummaryPageState extends State<SummaryPage> {
         title: '全部資料',
         color: Colors.yellow,
         icon: SizedBox(
-          width: 30, height: 50,
+          width: 30,
+          height: 50,
           child: Icon(
             size: 30,
             Icons.water_damage,
@@ -178,7 +205,9 @@ class _SummaryPageState extends State<SummaryPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const SettingsPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const SettingsPage()
+                          ),
                         );
                       } 
                     )
@@ -189,7 +218,9 @@ class _SummaryPageState extends State<SummaryPage> {
                 child: ListView.separated(
                   itemCount: cardList.length,
                   itemBuilder: (BuildContext context, int index) => cardList[index],
-                  separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10)
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 10);
+                  }
                 )
               )
             ]

@@ -36,7 +36,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: ListView.separated(
                   itemCount: listView.length,
                   itemBuilder: (BuildContext context, int index) => listView[index],
-                  separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 10)
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 10);
+                  }
                 )
               )
             ]
@@ -46,4 +48,3 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-

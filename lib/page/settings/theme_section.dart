@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_water_moblie/provider/theme.dart';
@@ -15,8 +14,6 @@ class _ThemeSectionState extends State<ThemeSection> {
   late final ThemeProvider provider;
   ThemeMode currentTheme = ThemeMode.dark;
 
-  void setStateListener() => setState(() {});
-
   @override
   void initState() {
     fetchTheme();
@@ -25,17 +22,16 @@ class _ThemeSectionState extends State<ThemeSection> {
 
   @override
   void dispose() {
-    provider.removeListener(setStateListener);
+    provider.removeListener(() => setState(() {}));
     super.dispose();
   }
 
   void fetchTheme() async {
     provider = Provider.of<ThemeProvider>(context, listen: false);
     currentTheme = await provider.fetch();
-    provider.addListener(setStateListener);
+    provider.addListener(() => setState(() {}));
   }
   
-
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
@@ -55,27 +51,29 @@ class _ThemeSectionState extends State<ThemeSection> {
             ],
           ),
           const SizedBox(height: 5),
-          LayoutBuilder(builder: (context, constraint) {
-            final width = (constraint.maxWidth - 20) / 3;
-            return Row(
-              children: [
-                ThemeButton(
-                  size: width,
-                  theme: ThemeMode.system,
-                ),
-                const SizedBox(width: 10),
-                ThemeButton(
-                  size: width,
-                  theme: ThemeMode.dark,
-                ),
-                const SizedBox(width: 10),
-                ThemeButton(
-                  size: width,
-                  theme: ThemeMode.light
-                )
-              ],
-            );
-          }),
+          LayoutBuilder(
+            builder: (context, constraint) {
+              final double width = (constraint.maxWidth - 20) / 3;
+              return Row(
+                children: [
+                  ThemeButton(
+                    size: width,
+                    theme: ThemeMode.system,
+                  ),
+                  const SizedBox(width: 10),
+                  ThemeButton(
+                    size: width,
+                    theme: ThemeMode.dark,
+                  ),
+                  const SizedBox(width: 10),
+                  ThemeButton(
+                    size: width,
+                    theme: ThemeMode.light
+                  )
+                ],
+              );
+            }
+          ),
         ],
       ),
     );
@@ -83,7 +81,8 @@ class _ThemeSectionState extends State<ThemeSection> {
 }
 
 class ThemeButton extends StatefulWidget {
-  const ThemeButton({super.key, 
+  const ThemeButton({
+    super.key, 
     required this.size,
     required this.theme,
   });
@@ -115,7 +114,7 @@ class _ThemeButtonState extends State<ThemeButton> {
   ThemeData getThemeData(ThemeMode theme, BuildContext context) {
     switch (theme.index) {
       case 0:
-        final platformBright = MediaQuery.of(context).platformBrightness.index;
+        final int platformBright = MediaQuery.of(context).platformBrightness.index;
         return (platformBright == 0) ? ThemePack.dark : ThemePack.light;
       case 1: return ThemePack.light;
       case 2: return ThemePack.dark;
@@ -156,9 +155,11 @@ class _ThemeButtonState extends State<ThemeButton> {
 }
 
 class ThemeIcon extends StatelessWidget {
-  const ThemeIcon({super.key, 
+  const ThemeIcon({
+    super.key, 
     required this.title
   });
+
   final String title;
 
   @override
@@ -166,7 +167,7 @@ class ThemeIcon extends StatelessWidget {
     final themeData = Theme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
-        final maxHeight = constraints.maxHeight;
+        final double maxHeight = constraints.maxHeight;
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
@@ -178,13 +179,17 @@ class ThemeIcon extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text("Aa", style: TextStyle(
-                    fontSize: maxHeight / 3.0415,
-                    color: themeData.textTheme.titleLarge!.color,
-                  )),
+                  Text(
+                    "Aa",
+                    style: TextStyle(
+                      fontSize: maxHeight / 3.0415,
+                      color: themeData.textTheme.titleLarge!.color,
+                    )
+                  ),
                   const Spacer(),
                   Container(
-                    height: maxHeight / 3.0415, width: maxHeight / 3.0415,
+                    height: maxHeight / 3.0415,
+                    width: maxHeight / 3.0415,
                     margin: const EdgeInsets.only(bottom: 5),
                     decoration: BoxDecoration(
                       color: themeData.colorScheme.surface,

@@ -1,26 +1,20 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/core/extension.dart';
 
-enum ConnectState {
+enum ConnectionStatus {
   never, successful, failed, connecting
 }
 
-extension DateTimeConvert on DateTime {
-  double toMinutesSinceEpoch() {
-    return millisecondsSinceEpoch / (60 * 1000);
-  }
-}
-
-class WebsocketAPI extends ChangeNotifier{
+class WebSocketAPI extends ChangeNotifier{
   WebSocket? client;
   int clientID = -1;
   bool verified = false;
   String? serverAddress;
-  ConnectState get state => _state;
-  ConnectState _state = ConnectState.never;
+  ConnectionStatus get state => _state;
+  ConnectionStatus _state = ConnectionStatus.never;
 
   static final dataReciever = StreamController<List<dynamic>>();
   final dataRecieveStream = dataReciever.stream.asBroadcastStream();
@@ -30,24 +24,24 @@ class WebsocketAPI extends ChangeNotifier{
     await client?.close();
     
     serverAddress = url;
-    _state = ConnectState.connecting;
+    _state = ConnectionStatus.connecting;
     notifyListeners();
     try { client = await WebSocket.connect("ws://$url"); }
     on SocketException catch (error) {
-      _state = ConnectState.failed;
+      _state = ConnectionStatus.failed;
       return error.message;
     } on ArgumentError catch (error) {
-      _state = ConnectState.failed;
+      _state = ConnectionStatus.failed;
       return "無效的端口: ${(error.message as String).split(' ').last}";
     } on FormatException catch (_) {
-      _state = ConnectState.failed;
+      _state = ConnectionStatus.failed;
       return "無效的網址";
     } on Exception {
-      _state = ConnectState.failed;
+      _state = ConnectionStatus.failed;
       return "發生未知錯誤";
     }
 
-    _state = ConnectState.successful;
+    _state = ConnectionStatus.successful;
     client?.asBroadcastStream().listen(streamListener);
     notifyListeners();
     return null;
@@ -69,7 +63,7 @@ class WebsocketAPI extends ChangeNotifier{
     final data = map["d"] as Map<String, dynamic>;
     final exceptedKeys = ["id"];
     if (!exceptedKeys.every(data.keys.contains)) {
-      print("包含的資訊不對");
+      debugPrint("包含的資訊不對");
       return;
     }
     clientID = data["id"];
@@ -112,10 +106,10 @@ class WebsocketAPI extends ChangeNotifier{
     clientID = -1;
     verified = false;
     serverAddress = null;
-    _state = ConnectState.never;
+    _state = ConnectionStatus.never;
     notifyListeners();
     await client?.close();
   }
 }
 
-WebsocketAPI wsAPI = WebsocketAPI(); 
+WebSocketAPI wsAPI = WebSocketAPI(); 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smart_water_moblie/websocket.dart';
+import 'package:smart_water_moblie/core/websocket.dart';
 
 class DataViewDialog {
   late final BuildContext context;
@@ -13,8 +13,7 @@ class DataViewDialog {
     required this.animation,
   });
 
-  Future<void> show() async 
-  => await showModalBottomSheet(
+  Future<void> show() async => await showModalBottomSheet(
     context: context,
     enableDrag: !isProcessing,
     useSafeArea: true,
@@ -28,15 +27,12 @@ class DataViewDialog {
       maxChildSize: 0.9,
       minChildSize: 0.9,
       initialChildSize: 0.9,
-      builder: (context, scrollController) => build(context)
+      builder: (context, scrollController) {
+        return StatefulBuilder(
+          builder: (context, setState) => const ServerInitialize()
+        );
+      }
     )
-  );
-
-  Widget build(BuildContext context) 
-  => StatefulBuilder(
-    builder: ((context, setState) 
-    => const ServerInitialize()
-    ) 
   );
 }
 
@@ -49,7 +45,7 @@ class ServerInitialize extends StatefulWidget {
 
 class _ServerInitializeState extends State<ServerInitialize> {
   String? errorLore;
-  ConnectState result = ConnectState.never;
+  ConnectionStatus result = ConnectionStatus.never;
   final addrTextController = TextEditingController(text: "192.168.1.110");
   final portTextController = TextEditingController(text: "5678");
   
@@ -57,25 +53,11 @@ class _ServerInitializeState extends State<ServerInitialize> {
     final String addr = addrTextController.value.text;
     final String port = portTextController.value.text;
 
-    setState(() => result = ConnectState.connecting);
+    setState(() => result = ConnectionStatus.connecting);
     errorLore = await wsAPI.connect("$addr:$port");
     setState(() => result = wsAPI.state);
 
     return;
-  }
-
-  Function()? doneFunction() {
-    if (result == ConnectState.connecting) return null;
-    if (addrTextController.value.text.isEmpty || portTextController.text.isEmpty) return null;
-    if (result == ConnectState.successful) return () => Navigator.pop(context);
-
-    return connectWS;
-  }
-
-  Function()? cancelFunction() {
-    if (result == ConnectState.successful) return null;
-
-    return () => Navigator.pop(context);
   }
 
   String doneString() {
@@ -89,14 +71,20 @@ class _ServerInitializeState extends State<ServerInitialize> {
 
   @override
   Widget build(BuildContext context) {
-    final widgetList = [
+    final List<Widget> widgetList = [
       const SizedBox(height: 0),
       HeadingBar(
         doneText: doneString(),
         cancelText: "取消",
         title: "連線至伺服器",
-        onCancel: cancelFunction(),
-        onDone: doneFunction(),
+        onCancel: (
+          result != ConnectionStatus.successful
+        ) ? () => Navigator.pop(context) : null,
+        onDone: (
+          addrTextController.value.text.isNotEmpty &&
+          portTextController.text.isNotEmpty &&
+          result == ConnectionStatus.successful
+        ) ? () => Navigator.pop(context) : null,
       ),
       TextBox(
         title: "IP位置",
@@ -154,16 +142,13 @@ class HeadingBar extends StatelessWidget {
   final Function()? onDone;
   final Function()? onCancel;
 
-  Color textColor(Function()? function, BuildContext context) {
-    final themeData = Theme.of(context);
-
-    return (function==null) ? Colors.grey.shade600 : 
-      themeData.colorScheme.secondary;
-  }
+  Color textColor(Function()? function, BuildContext context) => (
+    function == null
+  ) ? Colors.grey.shade600 : Theme.of(context).colorScheme.secondary;
 
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    final ThemeData themeData = Theme.of(context);
 
     return Stack(
       alignment: Alignment.center,
@@ -217,7 +202,8 @@ class HeadingBar extends StatelessWidget {
 }
 
 class TextBox extends StatelessWidget {
-  const TextBox({super.key,
+  const TextBox({
+    super.key,
     required this.title,
     required this.controller,
     this.onChanged,
@@ -232,63 +218,65 @@ class TextBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    return LayoutBuilder(builder: (context, constraint) {
-      return SizedBox(
-        width: constraint.maxWidth, 
-        child: TextField(
-          maxLines: 1,
-          autocorrect: false,
-          onChanged: onChanged,
-          controller: controller,
-          enableSuggestions: false,
-          style: const TextStyle(fontSize: 18),
-          keyboardType: onlyDigits ? TextInputType.number : null,
-          inputFormatters: onlyDigits ? [FilteringTextInputFormatter.digitsOnly] : null,
-          decoration: InputDecoration(
-            isCollapsed: true,
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            prefixIcon: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text(title, 
-                    style: themeData.textTheme.bodyMedium!.copyWith(
-                      color: Colors.grey
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        return SizedBox(
+          width: constraint.maxWidth, 
+          child: TextField(
+            maxLines: 1,
+            autocorrect: false,
+            onChanged: onChanged,
+            controller: controller,
+            enableSuggestions: false,
+            style: const TextStyle(fontSize: 18),
+            keyboardType: onlyDigits ? TextInputType.number : null,
+            inputFormatters: onlyDigits ? [FilteringTextInputFormatter.digitsOnly] : null,
+            decoration: InputDecoration(
+              isCollapsed: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              prefixIcon: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Text(title, 
+                      style: themeData.textTheme.bodyMedium!.copyWith(
+                        color: Colors.grey
+                      )
                     )
                   )
-                )
-              ],
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 15, vertical: 12
+                ],
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 15, vertical: 12
+              )
             )
           )
-        )
-      );
-    });
+        );
+      }
+    );
   }
 }
 
 class InfoBox extends StatefulWidget {
-  const InfoBox({super.key,
+  const InfoBox({
+    super.key,
     required this.errorLore,
     required this.result
   });
 
   final String? errorLore;
-  final ConnectState result;
+  final ConnectionStatus result;
 
   @override
   State<InfoBox> createState() => _InfoBoxState();
 }
 
 class _InfoBoxState extends State<InfoBox> {
-
   Color getColor() {
     final themeData = Theme.of(context);
     switch(widget.result.index) {
@@ -337,13 +325,19 @@ class _InfoBoxState extends State<InfoBox> {
                 switchInCurve: Curves.easeInSine,
                 switchOutCurve: Curves.easeInOutSine,
                 duration: const Duration(milliseconds: 150),
-                child: Icon(getIcon(), size: 200, key: ValueKey<int>(widget.result.index)),
+                child: Icon(
+                  getIcon(),
+                  size: 200,
+                  key: ValueKey<int>(widget.result.index)
+                ),
               ),
               Text(getLore()),
               const SizedBox(height: 25)
             ],
           ),
-          (widget.result == ConnectState.connecting) ? const LinearProgressIndicator() : Container()
+          (
+            widget.result == ConnectionStatus.connecting
+          ) ? const LinearProgressIndicator() : const SizedBox.shrink()
         ]
       )
     );
