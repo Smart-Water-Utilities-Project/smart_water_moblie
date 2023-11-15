@@ -14,6 +14,8 @@ class _ThemeSectionState extends State<ThemeSection> {
   late final ThemeProvider provider;
   ThemeMode currentTheme = ThemeMode.dark;
 
+  void providerSetState() => setState(() {});
+
   @override
   void initState() {
     fetchTheme();
@@ -22,14 +24,14 @@ class _ThemeSectionState extends State<ThemeSection> {
 
   @override
   void dispose() {
-    provider.removeListener(() => setState(() {}));
+    provider.removeListener(providerSetState);
     super.dispose();
   }
 
   void fetchTheme() async {
     provider = Provider.of<ThemeProvider>(context, listen: false);
     currentTheme = await provider.fetch();
-    provider.addListener(() => setState(() {}));
+    provider.addListener(providerSetState);
   }
   
   @override

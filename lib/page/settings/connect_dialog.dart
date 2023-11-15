@@ -80,11 +80,17 @@ class _ServerInitializeState extends State<ServerInitialize> {
         onCancel: (
           result != ConnectionStatus.successful
         ) ? () => Navigator.pop(context) : null,
-        onDone: (
-          addrTextController.value.text.isNotEmpty &&
-          portTextController.text.isNotEmpty &&
-          result == ConnectionStatus.successful
-        ) ? () => Navigator.pop(context) : null,
+        onDone: () {
+          if (addrTextController.text.isEmpty || portTextController.text.isEmpty || result == ConnectionStatus.connecting) {
+            return;
+          }
+          if (result == ConnectionStatus.successful) {
+            Navigator.of(context).pop();
+          }
+          if (mounted) {
+            connectWS();
+          }
+        },
       ),
       TextBox(
         title: "IP位置",

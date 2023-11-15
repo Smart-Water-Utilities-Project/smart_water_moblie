@@ -19,7 +19,7 @@ class SensorDataParser {
     if (data == null) return [];
 
     final allNumbers = List<(int, double, DateTime?, DateTime?)>.generate(
-      23, (i) => (i, 0.0, null, null)
+      24, (i) => (i, 0.0, null, null)
     );
 
     data.forEach((decoded) {

@@ -98,7 +98,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
         minimum: 0,
         isVisible: false,
         labelFormat: '{value}公升',
-        maximum: 5
+        maximum: 30
       ),
       trackballBehavior: TrackballBehavior(
         enable: true,
