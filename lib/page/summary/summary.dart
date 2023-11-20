@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 
 import 'package:animated_flip_counter/animated_flip_counter.dart';
+import 'package:smart_water_moblie/core/websocket.dart';
 
 import 'package:smart_water_moblie/page/settings/settings.dart';
 import 'package:smart_water_moblie/page/summary/info_card.dart';
@@ -29,6 +34,26 @@ class SummaryPage extends StatefulWidget {
 }
 
 class _SummaryPageState extends State<SummaryPage> {
+  late StreamSubscription subscribe;
+
+  void onData(Map<String, dynamic> value) {
+    tempController.value = value["wt"]??0;
+    flowController.value = value["wf"]??0;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    subscribe = WebSocketAPI.instance.timelyDataRecieveStream.listen(onData);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscribe.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);

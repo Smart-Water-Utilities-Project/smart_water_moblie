@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_water_moblie/core/websocket.dart';
+import 'package:async/async.dart';
 
 class DataViewDialog {
   late final BuildContext context;
@@ -45,23 +48,22 @@ class ServerInitialize extends StatefulWidget {
 
 class _ServerInitializeState extends State<ServerInitialize> {
   String? errorLore;
-  ConnectionStatus result = ConnectionStatus.never;
   final addrTextController = TextEditingController(text: "192.168.1.110");
   final portTextController = TextEditingController(text: "5678");
-  
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void connectWS() async {
     final String addr = addrTextController.value.text;
     final String port = portTextController.value.text;
-
-    setState(() => result = ConnectionStatus.connecting);
-    errorLore = await wsAPI.connect("$addr:$port");
-    setState(() => result = wsAPI.state);
-
-    return;
+    errorLore = await WebSocketAPI.instance.connect("$addr:$port");
   }
 
   String doneString() {
-    switch(result.index){
+    switch(WebSocketAPI.instance.state.value.index){
       case 1: return "完成";
       case 3: return "連線中";
     }
@@ -69,43 +71,70 @@ class _ServerInitializeState extends State<ServerInitialize> {
     return "連線";
   }
 
+  Function()? getOnCencel() {
+    final state = WebSocketAPI.instance.state.value;
+    switch(state) {
+      case ConnectionStatus.successful: return () {
+        WebSocketAPI.instance.resetConnection();
+      };
+      default: return () {
+        WebSocketAPI.instance.connection?.cancel();
+        Navigator.pop(context);
+      };
+    }
+  }
+
+  Function()? getOnDone() {
+    final String addr = addrTextController.text;
+    final String port = portTextController.text;
+    final socketValue = WebSocketAPI.instance.state.value;
+    if (addr.isEmpty || port.isEmpty || socketValue == ConnectionStatus.connecting) {
+      return null;
+    }
+    if (WebSocketAPI.instance.state.value == ConnectionStatus.successful) {
+      return Navigator.of(context).pop;
+    }
+    if (mounted) {
+      return connectWS;
+    }
+    return null;
+  }
+
   @override
+  final socketState = WebSocketAPI.instance.state;
   Widget build(BuildContext context) {
     final List<Widget> widgetList = [
-      const SizedBox(height: 0),
-      HeadingBar(
-        doneText: doneString(),
-        cancelText: "取消",
-        title: "連線至伺服器",
-        onCancel: (
-          result != ConnectionStatus.successful
-        ) ? () => Navigator.pop(context) : null,
-        onDone: () {
-          if (addrTextController.text.isEmpty || portTextController.text.isEmpty || result == ConnectionStatus.connecting) {
-            return;
-          }
-          if (result == ConnectionStatus.successful) {
-            Navigator.of(context).pop();
-          }
-          if (mounted) {
-            connectWS();
-          }
-        },
+      ListenableBuilder(
+        listenable: WebSocketAPI.instance.state,
+        builder: (context, child) => HeadingBar(
+          cancelText: "取消",
+          title: "連線至伺服器",
+          doneText: doneString(),
+          onCancel: getOnCencel(),
+          onDone: getOnDone(),
+        )
       ),
-      TextBox(
-        title: "IP位置",
-        controller: addrTextController,
-        onChanged: (value) => setState(() => {})
+      ListenableBuilder(
+        listenable: socketState,
+        builder: (context, child) => TextBox(
+          title: "IP位置",
+          controller: addrTextController
+        )
       ),
-      TextBox(
-        title: "端口",
-        onlyDigits: true,
-        controller: portTextController,
-        onChanged: (value) => setState(() => {})
+      ListenableBuilder(
+        listenable: socketState,
+        builder: (context, child) => TextBox(
+          title: "端口",
+          onlyDigits: true,
+          controller: portTextController
+        )
       ),
-      InfoBox(
-        result: result,
-        errorLore: errorLore
+      ListenableBuilder(
+        listenable: socketState,
+        builder: (context, child) => InfoBox(
+          result: socketState.value,
+          errorLore: errorLore
+        )
       )
     ];
 
@@ -170,12 +199,9 @@ class HeadingBar extends StatelessWidget {
                   Colors.transparent
                 )
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text(cancelText,
-                  style: themeData.textTheme.labelMedium!.copyWith(
-                    color: textColor(onCancel, context),
-                  )
+              child: Text(cancelText,
+                style: themeData.textTheme.labelMedium!.copyWith(
+                  color: textColor(onCancel, context),
                 )
               )
             ),
@@ -187,12 +213,9 @@ class HeadingBar extends StatelessWidget {
                   Colors.transparent
                 )
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Text(doneText,
-                  style: themeData.textTheme.labelMedium!.copyWith(
-                    color: textColor(onDone, context)
-                  )
+              child: Text(doneText,
+                style: themeData.textTheme.labelMedium!.copyWith(
+                  color: textColor(onDone, context)
                 )
               )
             )
@@ -285,28 +308,35 @@ class InfoBox extends StatefulWidget {
 class _InfoBoxState extends State<InfoBox> {
   Color getColor() {
     final themeData = Theme.of(context);
-    switch(widget.result.index) {
-      case 2: return Colors.red.shade400;
+    switch(widget.result) {
+      case ConnectionStatus.failed:
+        print("set error lore => ${widget.errorLore}");
+        if (widget.errorLore != null) { return Colors.red.shade400; }
+        return themeData.inputDecorationTheme.fillColor!;
+        
       default: return themeData.inputDecorationTheme.fillColor!;
     }
   }
 
   String getLore() {
-    switch(widget.result.index) {
-      case 1: return '連線成功';
-      case 2: return widget.errorLore??'';
-      case 3: return "正在嘗試連線...";
+    switch(widget.result) {
+      case ConnectionStatus.successful: return '連線成功';
+      case ConnectionStatus.connecting: return "正在嘗試連線...";
+      case ConnectionStatus.failed:
+        if (widget.errorLore == null) {
+          return "尚未連接至伺服器";
+        } else {return widget.errorLore??'';}
+      default: return "尚未連接至伺服器";
     }
-    return "尚未連接至伺服器";
   }
 
   IconData getIcon() {
-    switch(widget.result.index) {
-      case 1: return Icons.check;
-      case 2: return Icons.error;
-      case 3: return Icons.wifi;
+    switch(widget.result) {
+      case ConnectionStatus.successful: return Icons.check;
+      case ConnectionStatus.failed: return Icons.error;
+      case ConnectionStatus.never: return Icons.wifi;
+      default: return Icons.sensors_off_rounded;
     }
-    return Icons.sensors_off_rounded;
   }
 
   @override
@@ -342,7 +372,7 @@ class _InfoBoxState extends State<InfoBox> {
             ],
           ),
           (
-            widget.result == ConnectionStatus.connecting
+            WebSocketAPI.instance.state.value == ConnectionStatus.connecting
           ) ? const LinearProgressIndicator() : const SizedBox.shrink()
         ]
       )

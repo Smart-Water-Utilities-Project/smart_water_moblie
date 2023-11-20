@@ -1,6 +1,7 @@
-import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/core/extension.dart';
 
@@ -8,43 +9,83 @@ enum ConnectionStatus {
   never, successful, failed, connecting
 }
 
-class WebSocketAPI extends ChangeNotifier{
-  WebSocket? client;
-  int clientID = -1;
-  bool verified = false;
-  String? serverAddress;
-  ConnectionStatus get state => _state;
-  ConnectionStatus _state = ConnectionStatus.never;
+class WebSocketAPI{
+  WebSocketAPI._();
 
-  static final dataReciever = StreamController<List<dynamic>>();
-  final dataRecieveStream = dataReciever.stream.asBroadcastStream();
+  static WebSocketAPI? _instance;
+  static WebSocketAPI get instance {
+    if (_instance == null) {
+      _instance = WebSocketAPI._();
+    }
+    return _instance!;
+  }
 
-  Future<String?> connect(String url) async {
-    verified = false;
-    await client?.close();
-    
-    serverAddress = url;
-    _state = ConnectionStatus.connecting;
-    notifyListeners();
-    try { client = await WebSocket.connect("ws://$url"); }
-    on SocketException catch (error) {
-      _state = ConnectionStatus.failed;
+  static WebSocket? client;
+  CancelableOperation? connection;
+
+  int? _id;
+  String? _addr;
+  bool _verify = false;
+  final ValueNotifier<ConnectionStatus> _state = ValueNotifier(ConnectionStatus.never);
+
+  int? get id => _id;
+  String? get addr => _addr;
+  bool get verify => _verify;
+  ValueNotifier<ConnectionStatus> get state => _state;
+
+  static final chartDataReciever = StreamController<List<dynamic>>();
+  final chartDataRecieveStream = chartDataReciever.stream.asBroadcastStream();
+
+  static final timelyDataReciever = StreamController<Map<String, dynamic>>();
+  final timelyDataRecieveStream = timelyDataReciever.stream.asBroadcastStream();
+
+  Future<String?> _connect(String url) async {
+    try{
+      client = await WebSocket.connect("ws://$url");
+    } on SocketException catch (error) {
+      _state.value = ConnectionStatus.failed;
       return error.message;
     } on ArgumentError catch (error) {
-      _state = ConnectionStatus.failed;
+      _state.value = ConnectionStatus.failed;
       return "無效的端口: ${(error.message as String).split(' ').last}";
     } on FormatException catch (_) {
-      _state = ConnectionStatus.failed;
+      _state.value = ConnectionStatus.failed;
       return "無效的網址";
     } on Exception {
-      _state = ConnectionStatus.failed;
+      _state.value = ConnectionStatus.failed;
       return "發生未知錯誤";
-    }
-
-    _state = ConnectionStatus.successful;
-    client?.asBroadcastStream().listen(streamListener);
-    notifyListeners();
+    } 
     return null;
+  }
+
+  Future<String?> connect(String url) async {
+    // await client?.close();
+    _addr = url;
+    _verify = false;
+    _state.value = ConnectionStatus.connecting;
+
+    final process = _connect(url);
+    try {
+      connection = CancelableOperation.fromFuture(
+        process,
+        onCancel: () {}
+      );
+      await process.timeout(const Duration(seconds: 3));
+      if (connection?.isCanceled??true) {return null;}
+    } on TimeoutException catch (_) {
+      if (connection?.isCanceled??true) {return null;}
+      _state.value = ConnectionStatus.failed;
+      return "連線逾時";
+    } 
+
+    final result = await process;
+    if (result == null) {
+      _state.value = ConnectionStatus.successful;
+      client?.asBroadcastStream().listen(streamListener);
+      return null;
+    }
+    return result;
+    
   }
 
   void streamListener(dynamic event) {
@@ -66,7 +107,7 @@ class WebSocketAPI extends ChangeNotifier{
       debugPrint("包含的資訊不對");
       return;
     }
-    clientID = data["id"];
+    _id = data["id"];
 
     final returnData = {
       "op": 2,
@@ -81,12 +122,14 @@ class WebSocketAPI extends ChangeNotifier{
   void onGeneral(Map<String, dynamic> map) {
     switch(map["t"] as String) {
       case "REQUEST_HISTORY_DATA_ACK": {
-        dataReciever.sink.add(map["d"]);
+        chartDataReciever.sink.add(map["d"]);
       }
 
+      case "SENSOR_DATA_FORWARD": {
+        timelyDataReciever.sink.add(map["d"]);
+      }
     }
   }
-
 
   void getData((DateTime, DateTime) range) async {
     Map<String, dynamic> uploadData = {
@@ -102,14 +145,18 @@ class WebSocketAPI extends ChangeNotifier{
   }
 
   Future<void> disconnect() async {
-    client = null;
-    clientID = -1;
-    verified = false;
-    serverAddress = null;
-    _state = ConnectionStatus.never;
-    notifyListeners();
+    _id = -1;
+    _addr = null;
+    _verify = false;
+    _state.value = ConnectionStatus.never;
     await client?.close();
   }
-}
 
-WebSocketAPI wsAPI = WebSocketAPI(); 
+  void resetConnection() async {
+    state.value = ConnectionStatus.never;
+    await connection?.cancel();
+    disconnect();
+    client = null;
+  }
+
+}

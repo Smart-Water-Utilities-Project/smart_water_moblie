@@ -40,6 +40,7 @@ dependencies:
   animated_flip_counter: ^0.2.6
   fl_chart: ^0.64.0
   syncfusion_flutter_charts: ^23.1.44
+  async: ^2.11.0
 
 dev_dependencies:
   flutter_test:

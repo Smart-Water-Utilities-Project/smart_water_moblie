@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:smart_water_moblie/appbar.dart';
-import 'package:smart_water_moblie/core/data_parser.dart';
 
+import 'package:smart_water_moblie/appbar.dart';
+import 'package:smart_water_moblie/core/demostrate.dart';
 import 'package:smart_water_moblie/core/websocket.dart';
+import 'package:smart_water_moblie/core/data_parser.dart';
 import 'package:smart_water_moblie/page/waterflow/chart.dart';
 import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
 
@@ -12,8 +12,8 @@ class WaterflowPage extends StatefulWidget {
   WaterflowPage({super.key});
 
   final Color dark = Colors.black;
-  final Color normal = Colors.grey.shade800;
   final Color light = Colors.white;
+  final Color normal = Colors.grey.shade800;
 
   @override
   State<WaterflowPage> createState() => _WaterflowPageState();
@@ -26,14 +26,15 @@ class _WaterflowPageState extends State<WaterflowPage> {
   late final ModeSwitch modeSwitch;
   late final StreamSubscription<List<dynamic>> subscription;
 
-  void setData(event) => setState(() {
+  void setData(event) {
     switch(showType) {
       case ShowType.day: data = SensorDataParser.day(event);
       case ShowType.week: data = SensorDataParser.week(event);
       case ShowType.month: data = SensorDataParser.month(event, reqMonth().$2.day);
     }
-    debugPrint("[DATA_SET] $event");
-  });
+
+    setState(() {});
+  }
 
   (DateTime, DateTime) reqDay() {
     final now = DateTime.now();
@@ -59,25 +60,30 @@ class _WaterflowPageState extends State<WaterflowPage> {
     final startTime = DateTime(now.year, now.month, 1);
     final endTime = now.month < 12 ? DateTime(now.year, now.month + 1, 0) : DateTime(now.year, 1, 0);
     
-    
     return (startTime, endTime);
+  }
+
+  void onSwitchChange(ShowType event) {
+    showType = event;
+    late (DateTime, DateTime) range;
+    switch (event) {
+      case ShowType.day: range = reqDay();
+      case ShowType.week: range = reqWeek();
+      case ShowType.month: range = reqMonth();
+    }
+
+    final passData = demoMode.chartDemo(timeSet: range);
+    if (passData != null) {
+      WebSocketAPI.chartDataReciever.sink.add(passData);
+    } else { WebSocketAPI.instance.getData(range); }
+
   }
 
   @override
   void initState() {
     super.initState();
-    subscription = wsAPI.dataRecieveStream.listen(setData);
-    modeSwitch = ModeSwitch(
-      onChange: (ShowType event) {
-        showType = event;
-
-        switch (event) {
-          case ShowType.day: wsAPI.getData(reqDay());
-          case ShowType.week: wsAPI.getData(reqWeek());
-          case ShowType.month: wsAPI.getData(reqMonth());
-        }
-      }
-    );
+    subscription = WebSocketAPI.instance.chartDataRecieveStream.listen(setData);
+    onSwitchChange(showType);
   }
 
   @override
@@ -93,11 +99,11 @@ class _WaterflowPageState extends State<WaterflowPage> {
     // final barsWidth = 8.0 * mediaQuery.size.width / 400;
 
     final widgetList = [
-      const SizedBox(height: 0),
-      modeSwitch,
+      const SizedBox(height: 10),
+      ModeSwitch(onChange: onSwitchChange),
       WaterflowChart(
-        maxY: 10,
-        data: data
+        data: data,
+        selectedMode: showType
       )
     ];
 
@@ -112,13 +118,10 @@ class _WaterflowPageState extends State<WaterflowPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
+        child: ListView.builder(
+          // physics: const NeverScrollableScrollPhysics(),
           itemCount: widgetList.length,
           itemBuilder:(context, index) => widgetList[index],
-          separatorBuilder:(context, index) {
-            return const SizedBox(height: 10);
-          }
         )
       )
     );

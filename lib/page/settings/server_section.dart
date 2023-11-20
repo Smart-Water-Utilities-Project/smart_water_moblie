@@ -23,7 +23,7 @@ class _ServerSectionState extends State<ServerSection> {
         color: themeData.colorScheme.primaryContainer
       ),
       child: ListenableBuilder(
-        listenable: wsAPI,
+        listenable: WebSocketAPI.instance.state,
         builder: (context, child) => const Column(
           children: [
             Row(
@@ -52,20 +52,6 @@ class DetailBox extends StatefulWidget {
 }
 
 class _DetailBoxState extends State<DetailBox> {
-  void setStateFunction() => setState(() {});
-
-  @override
-  void initState() {
-    wsAPI.addListener(setStateFunction);
-    super.initState();
-  }
-  
-  @override
-  void dispose() {
-    wsAPI.removeListener(setStateFunction);
-    super.dispose();
-  }
-
   Widget buildSuccess(BoxConstraints constraints) => Row(
     mainAxisAlignment: MainAxisAlignment.start,
     children: [
@@ -74,8 +60,8 @@ class _DetailBoxState extends State<DetailBox> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("本機ID: ${wsAPI.clientID}"),
-          Text("伺服器: ${wsAPI.serverAddress}"),
+          Text("本機ID: ${WebSocketAPI.instance.id}"),
+          Text("伺服器: ${WebSocketAPI.instance.addr}"),
         ],
       )
     ]
@@ -89,7 +75,7 @@ class _DetailBoxState extends State<DetailBox> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("本機ID: ${wsAPI.clientID}"),
+          Text("本機ID: ${WebSocketAPI.instance.id}"),
           const Text("尚未連接至伺服器"),
         ],
       )
@@ -98,18 +84,22 @@ class _DetailBoxState extends State<DetailBox> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => AnimatedContainer(
-        width: double.infinity,
-        duration: const Duration(milliseconds: 350),
-        padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-        decoration: BoxDecoration(
-          color: (wsAPI.state == ConnectionStatus.successful) ?
-            Colors.green : Colors.red,
-          borderRadius: BorderRadius.circular(15)
-        ),
-        child: (wsAPI.state == ConnectionStatus.successful) ? 
-          buildSuccess(constraints) : buildNever(constraints)
+    final websocketState = WebSocketAPI.instance.state;
+    return ListenableBuilder(
+      listenable: websocketState,
+      builder: (context, child) => LayoutBuilder(
+        builder: (context, constraints) => AnimatedContainer(
+          width: double.infinity,
+          duration: const Duration(milliseconds: 350),
+          padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+          decoration: BoxDecoration(
+            color: (websocketState.value == ConnectionStatus.successful) ?
+              Colors.green : Colors.red,
+            borderRadius: BorderRadius.circular(15)
+          ),
+          child: (websocketState.value == ConnectionStatus.successful) ? 
+            buildSuccess(constraints) : buildNever(constraints)
+        )
       )
     );
   }
@@ -123,25 +113,12 @@ class ActionButton extends StatefulWidget  {
 }
 
 class _ActionButtonState extends State<ActionButton> with TickerProviderStateMixin {
-
-  void setStateFunction() => setState(() {});
-
-  @override
-  void initState() {
-    wsAPI.addListener(setStateFunction);
-    super.initState();
-  }
-  
-  @override
-  void dispose() {
-    wsAPI.removeListener(setStateFunction);
-    super.dispose();
-  }
-
   Widget buildConnect() {
     final themeData = Theme.of(context);
     return TextButton(
       onPressed: () {
+        WebSocketAPI.instance.resetConnection();
+        
         final animationController = AnimationController(
           vsync: this,
           duration: const Duration(milliseconds: 200)
@@ -165,7 +142,7 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
     final themeData = Theme.of(context);
     return TextButton(
       onPressed: () async {
-        await wsAPI.disconnect();
+        await WebSocketAPI.instance.disconnect();
       },
       child: Text("中斷連線", 
         style: themeData.textTheme.labelMedium,
@@ -175,9 +152,15 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    if (wsAPI.state == ConnectionStatus.successful) {
-      return buildDisconnect();
-    }
-    return buildConnect();
+    final websocketState = WebSocketAPI.instance.state;
+    return ListenableBuilder(
+      listenable: websocketState,
+      builder: (context, child) {
+        if (websocketState.value == ConnectionStatus.successful) {
+          return buildDisconnect();
+        }
+        return buildConnect();
+      }
+    );
   }
 }

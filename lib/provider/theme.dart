@@ -5,7 +5,6 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode theme = ThemeMode.system;
   
   Future<ThemeMode> fetch() async {
-    WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int index = prefs.getInt('themeMode') ?? 0;
     theme = ThemeMode.values[index];
@@ -87,7 +86,11 @@ class ThemePack {
           const EdgeInsets.symmetric(horizontal: 10)
         )
       )
-    )
+    ),
+    switchTheme: SwitchThemeData(
+      // thumbColor: MaterialStateProperty.all(primary),
+      trackColor: MaterialStateProperty.resolveWith((states) =>
+        states.contains(MaterialState.selected) ? Colors.blue : Colors.grey))
   );
 
   static final light = ThemeData(
@@ -159,7 +162,10 @@ class ThemePack {
           const EdgeInsets.symmetric(horizontal: 10)
         )
       )
-    )
+    ),
+    switchTheme: SwitchThemeData(
+      // thumbColor: MaterialStateProperty.all(primary),
+      trackColor: MaterialStateProperty.resolveWith((states) =>
+      states.contains(MaterialState.selected) ? Colors.blue : Colors.grey))
   );
-
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:smart_water_moblie/core/demomode.dart';
-import 'package:smart_water_moblie/core/websocket.dart';
+import 'package:smart_water_moblie/core/demostrate.dart';
 import 'package:smart_water_moblie/provider/theme.dart';
 import 'package:smart_water_moblie/page/summary/summary.dart';
 
@@ -11,8 +10,8 @@ ThemeProvider themeProvider = ThemeProvider();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await themeProvider.fetch();
-  wsAPI.connect("192.168.1.110:5678");
-  DemoMode();
+  await demoMode.initialize();
+  // wsAPI.connect("192.168.1.110:5678");
   runApp(const MyApp());
 }
 
