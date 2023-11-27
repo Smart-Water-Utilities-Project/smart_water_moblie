@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:smart_water_moblie/core/websocket.dart';
+import 'package:smart_water_moblie/core/api.dart';
 import 'package:smart_water_moblie/page/settings/connect_dialog.dart';
 
 class ServerSection extends StatefulWidget {
@@ -17,7 +17,7 @@ class _ServerSectionState extends State<ServerSection> {
     final themeData = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 5, 10 ,10),
+      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: themeData.colorScheme.primaryContainer
@@ -35,7 +35,7 @@ class _ServerSectionState extends State<ServerSection> {
             ),
             SizedBox(height: 5),
             DetailBox(),
-            SizedBox(height: 10),
+            SizedBox(height: 4),
             ActionButton()
           ]
         )
@@ -60,8 +60,8 @@ class _DetailBoxState extends State<DetailBox> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("本機ID: ${WebSocketAPI.instance.id}"),
           Text("伺服器: ${WebSocketAPI.instance.addr}"),
+          Text("本機ID: ${WebSocketAPI.instance.id}")
         ],
       )
     ]
@@ -72,13 +72,7 @@ class _DetailBoxState extends State<DetailBox> {
     children: [
       Icon(Icons.close, size: constraints.maxWidth/4.9),
       const SizedBox(width: 5),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("本機ID: ${WebSocketAPI.instance.id}"),
-          const Text("尚未連接至伺服器"),
-        ],
-      )
+      const Text("尚未連接至伺服器")
     ]
   );
 
@@ -113,7 +107,7 @@ class ActionButton extends StatefulWidget  {
 }
 
 class _ActionButtonState extends State<ActionButton> with TickerProviderStateMixin {
-  Widget buildConnect() {
+  Widget connectBtn() {
     final themeData = Theme.of(context);
     return TextButton(
       onPressed: () {
@@ -138,7 +132,7 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
     );
   }
 
-  Widget buildDisconnect() {
+  Widget disconnectBtn() {
     final themeData = Theme.of(context);
     return TextButton(
       onPressed: () async {
@@ -157,9 +151,9 @@ class _ActionButtonState extends State<ActionButton> with TickerProviderStateMix
       listenable: websocketState,
       builder: (context, child) {
         if (websocketState.value == ConnectionStatus.successful) {
-          return buildDisconnect();
+          return disconnectBtn();
         }
-        return buildConnect();
+        return connectBtn();
       }
     );
   }

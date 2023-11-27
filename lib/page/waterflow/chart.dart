@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -8,11 +9,13 @@ class WaterflowChart extends StatefulWidget {
   const WaterflowChart({
     super.key,
     required this.data,
+    required this.heading,
     required this.selectedMode
   });
 
-  final List<SensorDataPack> data;
   final ShowType selectedMode;
+  final SensorHeadData heading;
+  final List<SensorDataPack> data;
 
   @override
   State<WaterflowChart> createState() => _WaterflowChartState();
@@ -29,8 +32,10 @@ class _WaterflowChartState extends State<WaterflowChart> {
       child: Stack(
         children: [
           OverAllText(
-            value: showValue,
-            animationDisableFlag: animationDisableFlag
+            hide: showValue,
+            heading: widget.heading,
+            selectedMode: widget.selectedMode,
+            animationDisableFlag: animationDisableFlag,
           ),
           _chartBuilder()
         ],
@@ -104,7 +109,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
       primaryYAxis: NumericAxis(
         minimum: 0,
         isVisible: false,
-        maximum: (widget.data.isEmpty) ? 50 : widget.data.first.maxWf*1.3,
+        maximum: (widget.data.isEmpty) ? 50 : widget.heading.maxWf*1.3,
       ),
       trackballBehavior: TrackballBehavior(
         enable: true,
@@ -126,7 +131,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
         animationDuration: 1000,
         dataSource: widget.data,
         xValueMapper: (SensorDataPack data, _) {
-          return SensorDataParser.displayLabel(widget.data[data.xIndex], widget.selectedMode);
+          return SensorDataParser.displayLabel(data, widget.selectedMode);
         },
         yValueMapper: (SensorDataPack data, _) => data.waterflow,
         pointColorMapper: (SensorDataPack data, _) => Colors.red,
@@ -143,11 +148,15 @@ class _WaterflowChartState extends State<WaterflowChart> {
 class OverAllText extends StatefulWidget {
   const OverAllText({
     super.key,
-    required this.value,
+    required this.hide,
+    required this.heading,
+    required this.selectedMode,
     required this.animationDisableFlag
   });
 
-  final ValueNotifier<bool> value;
+  final ShowType selectedMode;
+  final SensorHeadData heading;
+  final ValueNotifier<bool> hide;
   final int animationDisableFlag;
 
   @override
@@ -155,6 +164,29 @@ class OverAllText extends StatefulWidget {
 }
 
 class _OverAllTextState extends State<OverAllText> {
+
+  String getTimeText() {
+    final startTs = widget.heading.startTs;
+    final endTs = widget.heading.endTs;
+    if (startTs == null && endTs == null) {
+      return "無時間資料";
+    }
+    switch(widget.selectedMode) {
+      case ShowType.day:
+        return DateFormat('yyyy年 MM/dd').format(startTs ?? endTs!);
+      
+      case ShowType.week:
+        return "${DateFormat('yyyy年 MM/dd').format(startTs!)} - ${DateFormat('MM/dd').format(endTs!)}";
+
+      case ShowType.month:
+        final daysOfMonth = DateTime(startTs!.year, startTs.month+1, 0).day;
+        return DateFormat('yyyy年 MM/1 - MM/$daysOfMonth').format(startTs);
+        // ${DateFormat('dd 日').format(endTs!)
+      
+      default: 
+        return "無時間資料";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,12 +197,12 @@ class _OverAllTextState extends State<OverAllText> {
       height: 80, width: double.infinity,
       margin: const EdgeInsets.only(top: 10),
       child: ListenableBuilder(
-        listenable: widget.value,
+        listenable: widget.hide,
         builder: (context, child) => AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
         switchInCurve: Curves.easeInOutSine,
         switchOutCurve: Curves.easeOutSine,
-          child: widget.value.value ? Row(
+          child: widget.hide.value ? Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
@@ -192,12 +224,12 @@ class _OverAllTextState extends State<OverAllText> {
                         color: Colors.grey,
                       )
                     ),
-                    TextSpan(text: "\n23574 公升",
+                    TextSpan(text: "\n${widget.heading.sumWf.toStringAsFixed(2)} 公升",
                       style: themeData.textTheme.titleMedium?.copyWith(
                         height: 0
                       )
                     ),
-                    TextSpan(text: "\n2023年12月14日",
+                    TextSpan(text: "\n${getTimeText()}",
                       style: themeData.textTheme.titleSmall?.copyWith(
                         height: 0,
                         color: Colors.grey

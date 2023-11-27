@@ -1,11 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/appbar.dart';
-import 'package:smart_water_moblie/core/demostrate.dart';
-import 'package:smart_water_moblie/core/websocket.dart';
-import 'package:smart_water_moblie/core/data_parser.dart';
-import 'package:smart_water_moblie/page/waterflow/chart.dart';
+import 'package:smart_water_moblie/page/waterflow/page_view.dart';
 import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
 
 class WaterflowPage extends StatefulWidget {
@@ -20,93 +16,99 @@ class WaterflowPage extends StatefulWidget {
 }
 
 class _WaterflowPageState extends State<WaterflowPage> {
-  List<SensorDataPack> data = [];
-  ShowType showType = ShowType.day;
 
-  late final ModeSwitch modeSwitch;
-  late final StreamSubscription<List<dynamic>> subscription;
-
-  void setData(event) {
-    switch(showType) {
-      case ShowType.day: data = SensorDataParser.day(event);
-      case ShowType.week: data = SensorDataParser.week(event);
-      case ShowType.month: data = SensorDataParser.month(event, reqMonth().$2.day);
-    }
-
+  PageController pageController = PageController();
+  List<GlobalKey<ModePageViewState>> indexKeys = [
+    GlobalKey<ModePageViewState>(),
+    GlobalKey<ModePageViewState>(),
+    GlobalKey<ModePageViewState>()
+  ]; // Use to reset child pageview to index 0
+  
+  void onSwitchChange(ShowType event) {
+    pageController.animateToPage(
+      event.index,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOutSine
+    );
     setState(() {});
   }
 
-  (DateTime, DateTime) reqDay() {
-    final now = DateTime.now();
-
-    final startTime = DateTime(now.year, now.month, now.day);
-    final endTime = startTime.add(const Duration(days: 1));
-
-    return (startTime, endTime);
+  void onDoubleClick(ShowType event) {
+    indexKeys[event.index].currentState?.resetPage();
   }
 
-  (DateTime, DateTime) reqWeek() {
-    final now = DateTime.now();
+  // (DateTime, DateTime) reqDay({int daysOffset = 0}) {
+  //   final now = DateTime.now();
 
-    final startTime = now.subtract(Duration(days: now.weekday));
-    final endTime = startTime.add(const Duration(days: 7));
+  //   final startTime = DateTime(now.year, now.month, now.day-daysOffset);
+  //   final endTime = startTime.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
+
+  //   return (startTime, endTime);
+  // }
+
+  // (DateTime, DateTime) reqWeek({int weekOffset = 0}) {
+  //   final now = DateTime.now();
+
+  //   final startTime = now.subtract(Duration(days: now.weekday + weekOffset*7)).add(const Duration(days: 1));
+  //   final endTime = startTime.add(const Duration(days: 8)).subtract(const Duration(milliseconds: 1));
     
-    return (startTime, endTime);
-  }
+  //   return (startTime, endTime);
+  // }
 
-  (DateTime, DateTime) reqMonth() {
-    final now = DateTime.now();
+  // (DateTime, DateTime) reqMonth({int monthOffset = 0}) {
+  //   final now = DateTime.now();
 
-    final startTime = DateTime(now.year, now.month, 1);
-    final endTime = now.month < 12 ? DateTime(now.year, now.month + 1, 0) : DateTime(now.year, 1, 0);
-    
-    return (startTime, endTime);
-  }
+  //   final startTime = DateTime(now.year, now.month-monthOffset, 1);
+  //   final endTime = DateTime(now.year, now.month-monthOffset+1, 1).subtract(const Duration(milliseconds: 1));
 
-  void onSwitchChange(ShowType event) {
-    showType = event;
-    late (DateTime, DateTime) range;
-    switch (event) {
-      case ShowType.day: range = reqDay();
-      case ShowType.week: range = reqWeek();
-      case ShowType.month: range = reqMonth();
-    }
+  //   return (startTime, endTime);
+  // }
 
-    final passData = demoMode.chartDemo(timeSet: range);
-    if (passData != null) {
-      WebSocketAPI.chartDataReciever.sink.add(passData);
-    } else { WebSocketAPI.instance.getData(range); }
+  // (DateTime, DateTime) getTimeRange({int offset=0}) {
+  //   switch (showType) {
+  //     case ShowType.day: return reqDay(daysOffset: offset);
+  //     case ShowType.week: return reqWeek(weekOffset: offset);
+  //     case ShowType.month: return reqMonth(monthOffset: offset);
+  //   }
+  // }
 
-  }
+  // Future<Response> fetchData((DateTime, DateTime) range) async {
+
+  //   final passData = demoMode.chartDemo(timeSet: range);
+
+  //   if (passData != null) {
+  //     return Response(jsonEncode(passData), 200);
+  //   } else { 
+  //     return HttpAPI.instance.getData(range);
+  //   }
+  // }
+
+  // (List<SensorDataPack>?, SensorHeadData?) getData(body, (DateTime, DateTime) range) {
+  //   final event = jsonDecode(body);
+  //   switch(showType) {
+  //     case ShowType.day: 
+  //       return SensorDataParser.day(event, range);
+  //     case ShowType.week: 
+  //       return SensorDataParser.week(event, range);
+  //     case ShowType.month:
+  //       return SensorDataParser.month(event, range);
+  //   }
+
+  //   // trendKey.currentState?.refresh();
+  // }
 
   @override
   void initState() {
     super.initState();
-    subscription = WebSocketAPI.instance.chartDataRecieveStream.listen(setData);
-    onSwitchChange(showType);
+    // onSwitchChange(ShowType.day);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    subscription.cancel();
-  }
-  
   @override
   Widget build(BuildContext context) {
-    // final mediaQuery = MediaQuery.of(context);
+    final mediaQuery = MediaQuery.of(context);
     // final barsSpace = 4.0 * mediaQuery.size.width / 400;
     // final barsWidth = 8.0 * mediaQuery.size.width / 400;
-
-    final widgetList = [
-      const SizedBox(height: 10),
-      ModeSwitch(onChange: onSwitchChange),
-      WaterflowChart(
-        data: data,
-        selectedMode: showType
-      )
-    ];
-
+  
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
@@ -116,14 +118,39 @@ class _WaterflowPageState extends State<WaterflowPage> {
           appBar: AppBar()
         )
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ListView.builder(
-          // physics: const NeverScrollableScrollPhysics(),
-          itemCount: widgetList.length,
-          itemBuilder:(context, index) => widgetList[index],
-        )
+      body: Column(
+        children: [
+          SizedBox(height: 50 + mediaQuery.viewPadding.top),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: ModeSwitch(
+              onChange: onSwitchChange
+            )
+          ),
+          Expanded(
+            child: PageView(
+              controller: pageController,
+              scrollBehavior: const ScrollBehavior(),
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                ModePageView(
+                  key: indexKeys[0],
+                  showType: ShowType.day
+                ),
+                ModePageView(
+                  key: indexKeys[1],
+                  showType: ShowType.week
+                ),
+                ModePageView(
+                  key: indexKeys[2],
+                  showType: ShowType.month
+                )
+              ]
+            )
+          )
+        ]
       )
     );
   }
 }
+

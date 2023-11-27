@@ -54,6 +54,7 @@ class DemoMode {
     // final hourRange = timeSet.$2.subtract(Duration(hours: timeSet.$1.hour)).hour;
     final msTs = timeSet.$2.toMinutesSinceEpoch() - timeSet.$1.toMinutesSinceEpoch();
     final hourRange = msTs/60 + 1;
+    
     for (int i=1; i<hourRange; i++) {
       final startTs = timeSet.$1.add(Duration(hours: i-1));
       final endTs = timeSet.$1.add(Duration(hours: i));

@@ -5,23 +5,41 @@ class SensorDataPack {
     required this.xIndex,
     required this.waterflow,
     required this.startTs,
-    required this.endTs,
-    required this.maxWf,
-    required this.maxWt
+    required this.endTs
   });
 
   final int xIndex;
   final double waterflow;
   final DateTime? startTs, endTs;
-  final double maxWf, maxWt;
+}
 
+class SensorHeadData {
+  SensorHeadData({
+    required this.maxWf,
+    required this.maxWt,
+    required this.sumWf,
+    required this.startTs,
+    required this.endTs
+  });
+
+  static SensorHeadData none() => SensorHeadData(
+    maxWf: 0,
+    maxWt: 0,
+    sumWf: 0,
+    startTs: DateTime.now(),
+    endTs: DateTime.now()
+  );
+
+  final double sumWf;
+  final double maxWf, maxWt;
+  final DateTime? startTs, endTs;
 }
 
 class SensorDataParser {
-  static List<SensorDataPack> day(List<dynamic>? data) {
-    if (data == null) return [];
+  static (List<SensorDataPack>?, SensorHeadData?) day(List<dynamic>? data, (DateTime, DateTime) range) {
+    if (data == null) return (null, null);
 
-    double maxWf = 0, maxWt = 0;
+    double maxWf = 0, maxWt = 0, sumWf = 0;
     final allNumbers = List<(int, double, DateTime?, DateTime?)>.generate(
       24, (i) => (i, 0.0, null, null)
     );
@@ -43,24 +61,38 @@ class SensorDataParser {
       );
 
       maxWf = (allNumbers[ts.hour].$2 > maxWf) ? allNumbers[ts.hour].$2 : maxWf;
+      sumWf += allNumbers[ts.hour].$2; 
       maxWt = (decoded["wt"] > maxWt) ? decoded["wt"] : maxWt;
     });
 
-    return allNumbers.map((key) => SensorDataPack(
+    final sensorData = allNumbers.map((key) => SensorDataPack(
       xIndex: key.$1,
       waterflow: key.$2,
       startTs: key.$3,
-      endTs: key.$4,
-      maxWf: maxWf,
-      maxWt: maxWt
+      endTs: key.$4
     )).toList();
+    
+    final startTsList = allNumbers.where((i) => i.$3 != null).toList();
+    final endTsList = allNumbers.where((i) => i.$4 != null).toList();
+
+    final sensorHeading = SensorHeadData(
+      maxWf: maxWf,
+      maxWt: maxWt,
+      sumWf: sumWf,
+      startTs: range.$1,
+      endTs: range.$2
+    );
+
+    return (sensorData, sensorHeading);
+    
   }
 
-  static List<SensorDataPack> week(List<dynamic>? data) {
-    if (data == null) return [];
+  static (List<SensorDataPack>?, SensorHeadData?) week(List<dynamic>? data, (DateTime, DateTime) range) {
+    if (data == null) return (null, null);
 
     final allNumbers = List<(int, double, DateTime?, DateTime?)>.generate(7, (i) => (i, 0.0, null, null));
-    double maxWf = 0, maxWt = 0;
+    double maxWf = 0, maxWt = 0, sumWf = 0;
+
 
     data.forEach((decoded) {
       final ts = DateTime.fromMillisecondsSinceEpoch((decoded["t"] as int) * 60 * 1000);
@@ -77,45 +109,61 @@ class SensorDataParser {
       allNumbers[ts.weekday - 1] = (lastValue.$1, lastValue.$2 + decoded["wf"], setStart, setEnd);
 
       maxWf = (allNumbers[ts.weekday-1].$2 > maxWf) ? allNumbers[ts.weekday-1].$2 : maxWf;
+      sumWf += allNumbers[ts.weekday-1].$2; 
       maxWt = (decoded["wt"] > maxWt) ? decoded["wt"] : maxWt;
     });
 
-    // final List<String> weekDay = ["", "一", "二", "三", "四", "五", "六", "日"];
-    
-    return allNumbers.map((key) => SensorDataPack(
+
+    final sensorData = allNumbers.map((key) => SensorDataPack(
       xIndex: key.$1,
       waterflow: key.$2,
       startTs: key.$3,
       endTs: key.$4,
+    )).toList();
+    final sensorHeading = SensorHeadData(
       maxWf: maxWf,
       maxWt: maxWt,
-    )).toList();
+      sumWf: sumWf,
+      startTs: range.$1,
+      endTs: range.$2
+    );
+
+    return (sensorData, sensorHeading);
   }
 
-  static List<SensorDataPack> month(List<dynamic>? data, int daysOfMonth) {
-    if (data == null) return [];
-
-    double maxWf = 0, maxWt = 0;
+  static (List<SensorDataPack>?, SensorHeadData?) month(List<dynamic>? data, (DateTime, DateTime) range) {
+    if (data == null) return (null, null);
+    
+    final daysOfMonth = range.$2.day+1;
+    double maxWf = 0, maxWt = 0, sumWf = 0;
     final allNumbers = List<(int, double, DateTime?)>.generate(daysOfMonth, (i) => (i, 0.0, null));
     
     data.forEach((decoded) {
       final ts = DateTime.fromMillisecondsSinceEpoch((decoded["t"] as int) * 60 * 1000);
+      final lastValue = allNumbers[ts.day - 1];
 
-      final lastValue = allNumbers[ts.day];
-      allNumbers[ts.day] = (ts.day, lastValue.$2 + decoded["wf"], ts);
-
-      maxWf = (allNumbers[ts.day].$2 > maxWf) ? allNumbers[ts.day].$2 : maxWf;
+      allNumbers[ts.day - 1] = (ts.day, lastValue.$2 + decoded["wf"], ts);
+      maxWf = (allNumbers[ts.day - 1].$2 > maxWf) ? allNumbers[ts.day - 1].$2 : maxWf;
+      sumWf += allNumbers[ts.day - 1].$2;
       maxWt = (decoded["wt"] > maxWt) ? decoded["wt"] : maxWt;
     });
 
-    return allNumbers.map((key) => SensorDataPack(
+    final sensorData = allNumbers.map((key) => SensorDataPack(
       xIndex: key.$1,
       waterflow: key.$2,
       startTs: key.$3,
       endTs: key.$3,
-      maxWf: maxWf,
-      maxWt: maxWt
     )).toList();
+
+    final sensorHeading = SensorHeadData(
+      maxWf: maxWf,
+      maxWt: maxWt,
+      sumWf: sumWf,
+      startTs: range.$1,
+      endTs: range.$2
+    );
+
+    return (sensorData, sensorHeading);
   }
 
   static String displayLabel(SensorDataPack data, ShowType type) {
@@ -125,10 +173,13 @@ class SensorDataParser {
 
       case ShowType.week: 
         final List<String> weekDay = ["一", "二", "三", "四", "五", "六", "日"];
-        return "星期${weekDay[data.xIndex]}";
+        if (data.xIndex < weekDay.length) {
+          return "星期${weekDay[data.xIndex]}"; 
+        }
+        return "星期${data.xIndex}";
 
       case ShowType.month:
-        return "${data.xIndex+1} 日";
+        return "${data.xIndex} 日";
     }
   }
 

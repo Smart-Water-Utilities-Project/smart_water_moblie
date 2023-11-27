@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/page/settings/acknowledgments.dart';
 
 import 'package:smart_water_moblie/page/settings/demo_section.dart';
 import 'package:smart_water_moblie/page/settings/theme_section.dart';
@@ -18,7 +19,8 @@ class _SettingsPageState extends State<SettingsPage> {
     List<Widget> listView = const [
       ServerSection(),
       ThemeSection(),
-      DemoSection()
+      DemoSection(),
+      Acknowledgements()
     ];
 
     return Scaffold(

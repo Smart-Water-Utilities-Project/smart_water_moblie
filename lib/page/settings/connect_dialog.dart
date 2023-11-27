@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'package:async/async.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smart_water_moblie/core/websocket.dart';
-import 'package:async/async.dart';
+import 'package:smart_water_moblie/core/api.dart';
 
 class DataViewDialog {
   late final BuildContext context;
@@ -100,8 +100,9 @@ class _ServerInitializeState extends State<ServerInitialize> {
     return null;
   }
 
-  @override
   final socketState = WebSocketAPI.instance.state;
+  
+  @override
   Widget build(BuildContext context) {
     final List<Widget> widgetList = [
       ListenableBuilder(

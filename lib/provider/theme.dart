@@ -5,6 +5,7 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode theme = ThemeMode.system;
   
   Future<ThemeMode> fetch() async {
+    WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int index = prefs.getInt('themeMode') ?? 0;
     theme = ThemeMode.values[index];
