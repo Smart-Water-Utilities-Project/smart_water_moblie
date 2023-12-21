@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:smart_water_moblie/core/demostrate.dart';
-import 'package:smart_water_moblie/core/notification.dart';
+import 'package:smart_water_moblie/core/firebase_msg.dart';
+import 'package:smart_water_moblie/core/local_notification.dart';
 import 'package:smart_water_moblie/core/api.dart';
 import 'package:smart_water_moblie/provider/theme.dart';
 import 'package:smart_water_moblie/page/summary/summary.dart';
@@ -12,10 +13,12 @@ GlobalKey appkey = GlobalKey();
 ThemeProvider themeProvider = ThemeProvider();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   await themeProvider.fetch();
   await demoMode.initialize();
   await NotificationAPI.instance.initizlize();
-  
+  await FireBaseAPI.instance.initNotification();
   WebSocketAPI.instance.reteyConnect();
   runApp(const MyApp());
 }

@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:smart_water_moblie/core/extension.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum ConnectionStatus {
@@ -227,12 +227,33 @@ class HttpAPI{
     return _instance!;
   }
 
-  String? _addr;
-
-  Future<Response> getData((DateTime, DateTime) range) async {
+  static Future<Response> getHistory((DateTime, DateTime) range) async {
     final startTs = range.$1.toMinutesSinceEpoch().floor();
     final endTs = range.$2.toMinutesSinceEpoch().floor();
     final uri = Uri.parse("http://192.168.1.110:5678/history?start=$startTs&end=$endTs");
     return await http.get(uri);
   }
+
+  static Future<bool?> getVavleState() async {
+    final uri = Uri.parse("http://192.168.1.110:5678/waterValve");
+    final result = await http.get(uri);
+    final resultMap = jsonDecode(result.body);
+
+    print(resultMap["status"]);
+
+    return resultMap["status"];
+
+  }
+
+  static Future<bool?> setVavleState(bool value) async {
+    final payload = jsonEncode({"status": "$value"});
+    final uri = Uri.parse("http://192.168.1.110:5678/waterValve");
+    try{ 
+      await http.put(uri, body: payload);
+    }on Exception catch (error) {
+      return null;
+    }
+    return value;
+  }
+
 }

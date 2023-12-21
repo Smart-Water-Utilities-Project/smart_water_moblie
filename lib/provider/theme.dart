@@ -5,7 +5,6 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode theme = ThemeMode.system;
   
   Future<ThemeMode> fetch() async {
-    WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int index = prefs.getInt('themeMode') ?? 0;
     theme = ThemeMode.values[index];
@@ -60,7 +59,7 @@ class ThemePack {
       surface: Colors.blue, // Status bar
       onSurface: Colors.white, // Icons color
       error: Colors.grey.shade300, 
-      onError: Colors.grey.shade300, 
+      onError: Colors.grey.shade300,
       secondary: Colors.blue, 
       onSecondary: Colors.blue,
       primaryContainer: const Color.fromRGBO(28, 28, 30, 1)

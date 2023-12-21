@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:smart_water_moblie/core/data_parser.dart';
-import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
+import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
 class WaterflowChart extends StatefulWidget {
   const WaterflowChart({
@@ -134,7 +134,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
           return SensorDataParser.displayLabel(data, widget.selectedMode);
         },
         yValueMapper: (SensorDataPack data, _) => data.waterflow,
-        pointColorMapper: (SensorDataPack data, _) => Colors.red,
+        pointColorMapper: (SensorDataPack data, _) => Colors.blue.shade800,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(4), 
           topRight: Radius.circular(4)

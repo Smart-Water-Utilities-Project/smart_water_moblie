@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/core/extension.dart';
-import 'package:smart_water_moblie/page/summary/summary.dart';
 
 class DemoMode {
   Timer? timelyUpdateTimer;
@@ -27,14 +27,16 @@ class DemoMode {
       if (timelyUpdateTimer?.isActive ?? false) {return;}
       const oneSec = Duration(milliseconds: 1000);
       timelyUpdateTimer = Timer.periodic(oneSec, (Timer t) {
-        sumController.set(sumController.value + 1.3);
-        tempController.set(Random().nextDouble() * 32);
-        flowController.set(Random().nextInt(1000).toDouble());
+        Controller.summary.set(Controller.summary.value + 1.3);
+        Controller.temp.set(Random().nextDouble() * 32);
+        Controller.flow.set(Random().nextInt(1000).toDouble());
+        Controller.level.set(Random().nextInt(1000).toDouble());
       });
     } else {
-      sumController.set(0);
-      tempController.set(0);
-      flowController.set(0);
+      Controller.summary.set(0);
+      Controller.temp.set(0);
+      Controller.flow.set(0);
+      Controller.level.set(0);
       timelyUpdateTimer?.cancel();
     }
   }
@@ -65,8 +67,9 @@ class DemoMode {
 
         final waterflow = Random().nextDouble() * 256;
         final watertemp = Random().nextDouble() * 15 + 20;
+        final waterlevel = Random().nextDouble() * 15 + 20;
 
-        data.add({"t": ts.floor(), "wf": waterflow, "wt": watertemp});
+        data.add({"t": ts.floor(), "wf": waterflow, "wt": watertemp, "wl": waterlevel});
       }
     }
     return data;

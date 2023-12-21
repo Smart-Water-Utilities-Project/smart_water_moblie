@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870165677729",
+    "project_id": "smart-water-project",
+    "storage_bucket": "smart-water-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870165677729:android:11f2009e44de82958e92e0",
+        "android_client_info": {
+          "package_name": "cse.tcivs.smart_water_moblie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDclaJEZ1pKt-uPUndPZDduYUjGozbShdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

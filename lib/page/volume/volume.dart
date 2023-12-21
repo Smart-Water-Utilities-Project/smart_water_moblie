@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/appbar.dart';
-import 'package:smart_water_moblie/page/waterflow/page_view.dart';
-import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
+import 'package:smart_water_moblie/page/volume/bottom_sheet.dart';
+import 'package:smart_water_moblie/page/volume/page_view.dart';
+import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
-class WaterflowPage extends StatefulWidget {
-  WaterflowPage({super.key});
-
-  final Color dark = Colors.black;
-  final Color light = Colors.white;
-  final Color normal = Colors.grey.shade800;
+class WaterValuePage extends StatefulWidget {
+  const WaterValuePage({super.key});
 
   @override
-  State<WaterflowPage> createState() => _WaterflowPageState();
+  State<WaterValuePage> createState() => _WaterValuePageState();
 }
 
-class _WaterflowPageState extends State<WaterflowPage> {
+class _WaterValuePageState extends State<WaterValuePage> {
 
   PageController pageController = PageController();
   List<GlobalKey<ModePageViewState>> indexKeys = [
@@ -114,40 +111,45 @@ class _WaterflowPageState extends State<WaterflowPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40),
           child: GeneralAppBar(
-          title: "水流資料",
+          title: "用水量資料",
           appBar: AppBar()
         )
       ),
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(height: 50 + mediaQuery.viewPadding.top),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ModeSwitch(
-              onChange: onSwitchChange
-            )
-          ),
-          Expanded(
-            child: PageView(
-              controller: pageController,
-              scrollBehavior: const ScrollBehavior(),
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                ModePageView(
-                  key: indexKeys[0],
-                  showType: ShowType.day
-                ),
-                ModePageView(
-                  key: indexKeys[1],
-                  showType: ShowType.week
-                ),
-                ModePageView(
-                  key: indexKeys[2],
-                  showType: ShowType.month
+          Column(
+            children: [
+              SizedBox(height: 50 + mediaQuery.viewPadding.top),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: ModeSwitch(
+                  onChange: onSwitchChange
                 )
-              ]
-            )
-          )
+              ),
+              Expanded(
+                child: PageView(
+                  controller: pageController,
+                  scrollBehavior: const ScrollBehavior(),
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    ModePageView(
+                      key: indexKeys[0],
+                      showType: ShowType.day
+                    ),
+                    ModePageView(
+                      key: indexKeys[1],
+                      showType: ShowType.week
+                    ),
+                    ModePageView(
+                      key: indexKeys[2],
+                      showType: ShowType.month
+                    )
+                  ]
+                )
+              )
+            ]
+          ),
+          const BottomDetailSheet()
         ]
       )
     );

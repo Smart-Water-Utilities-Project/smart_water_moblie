@@ -1,4 +1,4 @@
-package com.example.smart_water_moblie
+package cse.tcivs.smart_water_moblie
 
 import io.flutter.embedding.android.FlutterActivity
 

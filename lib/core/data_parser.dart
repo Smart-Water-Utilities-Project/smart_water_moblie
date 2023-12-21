@@ -1,4 +1,4 @@
-import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
+import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
 class SensorDataPack {
   SensorDataPack({

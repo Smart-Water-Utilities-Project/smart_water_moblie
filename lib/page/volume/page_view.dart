@@ -6,9 +6,9 @@ import 'package:http/http.dart';
 import 'package:smart_water_moblie/core/api.dart';
 import 'package:smart_water_moblie/core/data_parser.dart';
 import 'package:smart_water_moblie/core/demostrate.dart';
-import 'package:smart_water_moblie/page/waterflow/chart.dart';
-import 'package:smart_water_moblie/page/waterflow/mode_select.dart';
-import 'package:smart_water_moblie/page/waterflow/trend.dart';
+import 'package:smart_water_moblie/page/volume/chart.dart';
+import 'package:smart_water_moblie/page/volume/mode_select.dart';
+import 'package:smart_water_moblie/page/volume/trend.dart';
 
 class ModePageView extends StatefulWidget {
   const ModePageView({
@@ -72,7 +72,7 @@ class ModePageViewState extends State<ModePageView> {
     if (passData != null) {
       return Response(jsonEncode(passData), 200);
     } else { 
-      return HttpAPI.instance.getData(range);
+      return HttpAPI.getHistory(range);
     }
   }
 
