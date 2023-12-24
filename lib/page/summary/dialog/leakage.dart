@@ -20,13 +20,15 @@ class WaterLeakageState extends State<WaterLeakage> {
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then(
-      (instatnce) async {
-        isVavleOpen = await HttpAPI.getVavleState();
-        isNotifyEnable = instatnce.getBool("isLeakNotifyEnable")??false;
-        if(mounted) {setState(() {});}
-      }
-    );
+    SharedPreferences.getInstance().then((instatnce) async {
+      isNotifyEnable = instatnce.getBool("isLeakNotifyEnable")??false;
+      if(mounted) {setState(() {});}
+    });
+
+    HttpAPI.getVavleState().then((value) {
+      isVavleOpen = value;
+      if(mounted) {setState(() {});}
+    });
   }
 
   @override
@@ -42,6 +44,7 @@ class WaterLeakageState extends State<WaterLeakage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const NavigationPill(),
           const LeakageHeading(),

@@ -48,7 +48,7 @@ class _TemperatureCardState extends State<TemperatureCard> {
         onTap: () => launchDialog(
           context, 200, const TempertureDialog()
         ),
-        button: const Icon(Icons.settings,
+        button: const Icon(Icons.more_horiz,
           size: 27, color: Colors.orange
         )
       )

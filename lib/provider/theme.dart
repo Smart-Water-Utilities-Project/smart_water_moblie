@@ -88,7 +88,8 @@ class ThemePack {
       )
     ),
     switchTheme: SwitchThemeData(
-      // thumbColor: MaterialStateProperty.all(primary),
+      thumbColor: MaterialStateProperty.resolveWith((states) => 
+        states.contains(MaterialState.disabled) ? Colors.grey.shade100 : Colors.white),
       trackColor: MaterialStateProperty.resolveWith((states) =>
         states.contains(MaterialState.selected) ? Colors.blue : Colors.grey))
   );

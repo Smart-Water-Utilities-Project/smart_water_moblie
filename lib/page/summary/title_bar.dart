@@ -9,9 +9,10 @@ class TitleBar extends StatelessWidget {
     final themeData = Theme.of(context);
     
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
       children: [
-        Text('即時資訊', style: themeData.textTheme.titleLarge),
+        Text('智慧用水', style: themeData.textTheme.titleLarge),
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.settings, size: 35),

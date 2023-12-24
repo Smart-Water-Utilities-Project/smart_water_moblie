@@ -39,6 +39,7 @@ class _TempertureDialogState extends State<TempertureDialog> {
         color: themeData.inputDecorationTheme.fillColor
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const NavigationPill(),
           const TemperatureHeading(),

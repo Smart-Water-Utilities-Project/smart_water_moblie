@@ -28,7 +28,7 @@ class _FlowCardState extends State<FlowCard> {
         title: '水流量',
         iconPadding: false,
         color: Colors.cyan.shade700,
-        button: Icon(Icons.settings,
+        button: Icon(Icons.more_horiz,
           size: 27, color: Colors.cyan.shade700
         ),
         icon: SizedBox(

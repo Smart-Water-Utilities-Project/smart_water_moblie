@@ -57,7 +57,7 @@ class _TargetCardState extends State<TargetCard> {
             ]
           )
         ),
-        button: const Icon(Icons.settings,
+        button: const Icon(Icons.more_vert,
           size: 27, color: Colors.red
         ),
         onTap: () => launchDialog(

@@ -69,6 +69,18 @@ class _FancySwitchState extends State<FancySwitch> {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
 
+    final loreText = [
+      const SizedBox(height: 5),
+      Flexible(
+        child: Text(
+          widget.lore??'',
+          style: themeData.textTheme.labelSmall?.copyWith(
+            color: Colors.grey
+          )
+        )
+      )
+    ];
+
     return Material(
       clipBehavior: Clip.hardEdge,
       borderRadius: BorderRadius.circular(15),
@@ -78,22 +90,18 @@ class _FancySwitchState extends State<FancySwitch> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             child: Row(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.title),
-                  const SizedBox(height: 5),
-                  Flexible(
-                    child: Text(
-                      widget.lore??'',
-                      style: themeData.textTheme.labelSmall?.copyWith(
-                        color: Colors.grey
-                      )
-                    )
+                  (widget.lore == null) ? const SizedBox() : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: loreText
                   )
+                  
                 ]
               ),
               const Spacer(),
@@ -122,8 +130,7 @@ class NavigationPill extends StatelessWidget {
       child: Align(
         alignment: Alignment.center,
         child: Container(
-          width: 40, height: 8,
-          margin: const EdgeInsets.only(bottom: 5),
+          width: 40, height: 5,
           decoration: BoxDecoration(
             color: themeData.colorScheme.primary,
             borderRadius: BorderRadius.circular(20)

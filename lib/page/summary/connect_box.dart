@@ -9,7 +9,8 @@ class ConnectIndicator extends StatefulWidget {
   State<ConnectIndicator> createState() => _ConnectIndicatorState();
 }
 
-class _ConnectIndicatorState extends State<ConnectIndicator> with TickerProviderStateMixin{
+class _ConnectIndicatorState extends State<ConnectIndicator> 
+  with TickerProviderStateMixin, AutomaticKeepAliveClientMixin{
   bool isHide = false;
   
   void popDialog() {
@@ -27,9 +28,10 @@ class _ConnectIndicatorState extends State<ConnectIndicator> with TickerProvider
     
     dialog.show();
   }
-  
+ 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListenableBuilder(
       listenable: WebSocketAPI.instance.state,
       builder: (context, child) => ListenableBuilder(
@@ -52,6 +54,10 @@ class _ConnectIndicatorState extends State<ConnectIndicator> with TickerProvider
       )
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
 }
 
 class ConnectingBox extends StatelessWidget {

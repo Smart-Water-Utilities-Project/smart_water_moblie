@@ -236,12 +236,17 @@ class HttpAPI{
 
   static Future<bool?> getVavleState() async {
     final uri = Uri.parse("http://192.168.1.110:5678/waterValve");
-    final result = await http.get(uri);
-    final resultMap = jsonDecode(result.body);
-
-    print(resultMap["status"]);
-
-    return resultMap["status"];
+    final result = await http.get(uri)
+      .timeout(const Duration(seconds: 5))
+      .onError((error, stackTrace) {return Response("", 100);});
+    
+    switch(result.statusCode) {
+      case 200: 
+        return jsonDecode(result.body)["status"];
+      
+      default:
+        return null;
+    }
 
   }
 

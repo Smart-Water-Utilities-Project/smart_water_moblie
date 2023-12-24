@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/core/api.dart';
 import 'package:smart_water_moblie/core/counter.dart';
+import 'package:smart_water_moblie/page/summary/article_cover.dart';
 import 'package:smart_water_moblie/page/summary/title_bar.dart';
 import 'package:smart_water_moblie/page/summary/card/flow.dart';
 import 'package:smart_water_moblie/page/summary/card/usage.dart';
@@ -41,13 +43,14 @@ class _SummaryPageState extends State<SummaryPage>{
     subscribe.cancel();
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     
     List<Widget> cardList = [
+      const SizedBox(height: 80),
+      Text("即時資訊", style: themeData.textTheme.titleMedium),
+      const ConnectIndicator(),
       LayoutBuilder(
         builder: (context, constant) {
           final width = (constant.maxWidth-10) / 2;
@@ -60,43 +63,51 @@ class _SummaryPageState extends State<SummaryPage>{
           );
         }
       ),
+      const SizedBox(height: 10),
       const UsageCard(),
+      const SizedBox(height: 10),
       const TargetCard(),
+      const SizedBox(height: 10),
       const VolumeCard(),
-      // const InfoCard(
-      //   title: '全部資料',
-      //   color: Colors.yellow,
-      //   icon: SizedBox(
-      //     width: 30,
-      //     height: 50,
-      //     child: Icon(
-      //       size: 30,
-      //       Icons.water_damage,
-      //       color: Colors.yellow,
-      //     )
-      //   ),
-      //   widget: SizedBox()
-      // )
+      const SizedBox(height: 20),
+      Text("相關文章", style: themeData.textTheme.titleMedium),
+      const SizedBox(height: 10),
+      ArticleCover(
+        title: "測試",
+        lore: "震驚一萬年",
+      ),
+      const SizedBox(height: 10),
     ];
 
     return Scaffold(
-      appBar: AppBar(elevation: 0, toolbarHeight: 0),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        excludeHeaderSemantics: true,
+        surfaceTintColor: themeData.colorScheme.background,
+        backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
+        title: const TitleBar(),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+            child: Container(color: Colors.transparent)
+          )
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const SizedBox(height: 10),
-              const TitleBar(),
-              const ConnectIndicator(),
               Expanded(
                 child: ListView.separated(
+                  padding: EdgeInsets.zero,
                   itemBuilder: (context, index) => cardList[index],
                   itemCount: cardList.length,
                   separatorBuilder: (context, index) => 
-                    const SizedBox(height: 10)
+                    const SizedBox(height: 00)
                 )
               )
             ]
