@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:smart_water_moblie/core/demostrate.dart';
 import 'package:smart_water_moblie/core/firebase_msg.dart';
 import 'package:smart_water_moblie/core/local_notification.dart';
-import 'package:smart_water_moblie/core/api.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
 import 'package:smart_water_moblie/provider/theme.dart';
-import 'package:smart_water_moblie/page/summary/summary.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/summary.dart';
 
 
 GlobalKey appkey = GlobalKey();
@@ -19,7 +19,7 @@ void main() async {
   await demoMode.initialize();
   await NotificationAPI.instance.initizlize();
   await FireBaseAPI.instance.initNotification();
-  WebSocketAPI.instance.reteyConnect();
+  SmartWaterAPI.instance.reteyConnect();
   runApp(const MyApp());
 }
 

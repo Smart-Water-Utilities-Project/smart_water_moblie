@@ -16,12 +16,12 @@ enum ConnectionStatus {
   autoconnect;
 }
 
-class WebSocketAPI{
-  WebSocketAPI._();
+class SmartWaterAPI{
+  SmartWaterAPI._();
 
-  static WebSocketAPI? _instance;
-  static WebSocketAPI get instance {
-    _instance ??= WebSocketAPI._();
+  static SmartWaterAPI? _instance;
+  static SmartWaterAPI get instance {
+    _instance ??= SmartWaterAPI._();
     return _instance!;
   }
 
@@ -216,49 +216,174 @@ class WebSocketAPI{
     return;
   }
 
-}
-
-class HttpAPI{
-  HttpAPI._();
-
-  static HttpAPI? _instance;
-  static HttpAPI get instance {
-    _instance ??= HttpAPI._();
-    return _instance!;
-  }
-
-  static Future<Response> getHistory((DateTime, DateTime) range) async {
+  // HTTP protocol
+  Future<HttpAPIResponse<Response?>> getHistory((DateTime, DateTime) range) async {
     final startTs = range.$1.toMinutesSinceEpoch().floor();
     final endTs = range.$2.toMinutesSinceEpoch().floor();
-    final uri = Uri.parse("http://192.168.1.110:5678/history?start=$startTs&end=$endTs");
-    return await http.get(uri);
+    final uri = Uri.tryParse("http://$_addr/history?start=$startTs&end=$endTs");
+    Response result = Response("[]", 100);
+
+    if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse(
+        value: result,
+        statusCode: 0,
+        errorMsg: "尚未連線至伺服器",
+      );
+    }
+
+    try{
+      result = await http.get(uri)
+        .timeout(const Duration(seconds: 5));
+      return HttpAPIResponse(
+        value: result,
+        statusCode: result.statusCode,
+      );
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "無法連線至伺服器",
+        statusCode: result.statusCode,
+      );
+    }
   }
 
-  static Future<bool?> getVavleState() async {
-    final uri = Uri.parse("http://192.168.1.110:5678/waterValve");
-    final result = await http.get(uri)
-      .timeout(const Duration(seconds: 5))
-      .onError((error, stackTrace) {return Response("", 100);});
-    
-    switch(result.statusCode) {
-      case 200: 
-        return jsonDecode(result.body)["status"];
+  Future<HttpAPIResponse<bool?>> getVavleState() async {
+    final uri = Uri.tryParse("http://$_addr/waterValve");
+    if (uri==null || _addr == null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse(
+        value: null,
+        statusCode: 0,
+        errorMsg: "在連線到伺服器前，您無法變更部分項目",
+      );
+    }
+
+    try{
+      final result = await http.get(uri)
+        .timeout(const Duration(seconds: 5));
+        print(result.body);
+      return HttpAPIResponse(
+        statusCode: result.statusCode,
+        value: jsonDecode(result.body)["status"],
+      );
       
-      default:
-        return null;
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        statusCode: 100,
+        errorMsg: "無法連線至伺服器",
+      );
     }
-
   }
 
-  static Future<bool?> setVavleState(bool value) async {
-    final payload = jsonEncode({"status": "$value"});
-    final uri = Uri.parse("http://192.168.1.110:5678/waterValve");
-    try{ 
-      await http.put(uri, body: payload);
-    }on Exception catch (error) {
-      return null;
+  Future<HttpAPIResponse<bool>> setVavleState(bool value) async {
+    final payload = jsonEncode({"status": value});
+    final uri = Uri.tryParse("http://$_addr/waterValve");
+
+    if (uri == null || _addr == null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse(
+        value: false,
+        statusCode: 0,
+        errorMsg: "無法設定水閥狀態，尚未連線至伺服器",
+      );
     }
-    return value;
+
+    try{
+      final result = await http.put(uri, body: payload);
+      
+      if (result.body.isNotEmpty) {
+        return HttpAPIResponse(
+          value: !value,
+          statusCode: 100,
+          errorMsg: "API炸了, YFHD 的 Skill issue",
+        );
+      }
+
+      return HttpAPIResponse(
+        value: value,
+        statusCode: result.statusCode,
+      );
+
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse(
+        value: !value,
+        statusCode: 100,
+        errorMsg: "尚未連線至伺服器",
+      );
+    }
   }
 
+  Future<HttpAPIResponse<Response?>> setTarget({
+    int? daily,
+    int? monthly
+  }) async {
+    final uri = Uri.tryParse("http://$_addr/waterLimit");
+    final payload = jsonEncode({"daily_limit": daily});
+
+    if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse(
+        statusCode: 100,
+        value: Response("", 100),
+        errorMsg: "尚未連線至伺服器",
+      );
+    }
+
+    try{
+      final result = await http.put(uri, body: payload)
+        .timeout(const Duration(seconds: 5));
+      return HttpAPIResponse(
+        value: result,
+        statusCode: result.statusCode,
+      );
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "無法連線至伺服器",
+        statusCode: 100,
+      );
+    }
+  }
+
+  Future<HttpAPIResponse<(int, int)?>> getTarget() async {
+    final uri = Uri.tryParse("http://$_addr/waterLimit");
+
+    if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse(
+        value: (0,0),
+        statusCode: 100,
+        errorMsg: "在連線到伺服器前，您無法變更部分項目",
+      );
+    }
+
+    try{
+      final result = await http.get(uri)
+        .timeout(const Duration(seconds: 5));
+      print(result.body);
+
+      final dictResp = jsonDecode(result.body);
+      return HttpAPIResponse(
+        value: (dictResp["daily_limit"], dictResp["daily_limit"]),
+        statusCode: result.statusCode,
+      );
+    } on ArgumentError catch (_) {
+      print("ERROR");
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "無法連線至伺服器",
+        statusCode: 100,
+      );
+    }
+  }
+
+}
+
+class HttpAPIResponse<T> {
+  HttpAPIResponse({
+    this.errorMsg,
+    required this.value,
+    required this.statusCode,
+  });
+
+  final String? errorMsg;
+  final int statusCode;
+  T value;
 }

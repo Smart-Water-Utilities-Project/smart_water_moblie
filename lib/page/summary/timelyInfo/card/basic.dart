@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Card basics
 class InfoCard extends StatefulWidget {
   const InfoCard({
     super.key,

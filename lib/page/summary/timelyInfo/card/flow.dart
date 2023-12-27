@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/core/counter.dart';
 
-import 'package:smart_water_moblie/page/summary/card/basic.dart';
-import 'package:smart_water_moblie/page/summary/card/indicator.dart';
-import 'package:smart_water_moblie/page/summary/dialog/leakage.dart';
-import 'package:smart_water_moblie/page/summary/dialog/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
 
 class FlowCard extends StatefulWidget {
   const FlowCard({
@@ -28,9 +26,9 @@ class _FlowCardState extends State<FlowCard> {
         title: '水流量',
         iconPadding: false,
         color: Colors.cyan.shade700,
-        button: Icon(Icons.more_horiz,
-          size: 27, color: Colors.cyan.shade700
-        ),
+        // button: Icon(Icons.more_horiz,
+        //   size: 27, color: Colors.cyan.shade700
+        // ),
         icon: SizedBox(
           width: 30,
           height: 30,
@@ -46,9 +44,9 @@ class _FlowCardState extends State<FlowCard> {
             listenable: Controller.flow,
           )
         ),
-        onTap: () => launchDialog(
-          context, 300, const WaterLeakage()
-        ),
+        // onTap: () => launchDialog(
+        //   context, 300, const LeakageSettings()
+        // ),
       )
     );
   }

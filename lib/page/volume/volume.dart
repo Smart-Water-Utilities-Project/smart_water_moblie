@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+import 'dart:ui';
 
-import 'package:smart_water_moblie/appbar.dart';
+import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/page/volume/bottom_sheet.dart';
 import 'package:smart_water_moblie/page/volume/page_view.dart';
 import 'package:smart_water_moblie/page/volume/mode_select.dart';
@@ -103,23 +103,35 @@ class _WaterValuePageState extends State<WaterValuePage> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final themeData = Theme.of(context);
     // final barsSpace = 4.0 * mediaQuery.size.width / 400;
     // final barsWidth = 8.0 * mediaQuery.size.width / 400;
   
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(40),
-          child: GeneralAppBar(
-          title: "用水量資料",
-          appBar: AppBar()
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        excludeHeaderSemantics: true,
+        surfaceTintColor: themeData.colorScheme.background,
+        backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
+        title: Text("用水量資料",
+          style: themeData.textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.bold
+          )
+        ),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+            child: Container(color: Colors.transparent)
+          )
         )
       ),
       body: Stack(
         children: [
           Column(
             children: [
-              SizedBox(height: 50 + mediaQuery.viewPadding.top),
+              SizedBox(height: 65 + mediaQuery.viewPadding.top),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ModeSwitch(
@@ -149,7 +161,7 @@ class _WaterValuePageState extends State<WaterValuePage> {
               )
             ]
           ),
-          const BottomDetailSheet()
+          // const BottomDetailSheet()
         ]
       )
     );

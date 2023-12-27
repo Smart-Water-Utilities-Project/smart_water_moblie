@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:smart_water_moblie/core/api.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
 import 'package:smart_water_moblie/core/data_parser.dart';
 import 'package:smart_water_moblie/core/demostrate.dart';
 import 'package:smart_water_moblie/page/volume/chart.dart';
@@ -72,12 +72,14 @@ class ModePageViewState extends State<ModePageView> {
     if (passData != null) {
       return Response(jsonEncode(passData), 200);
     } else { 
-      return HttpAPI.getHistory(range);
+      final response = await SmartWaterAPI.instance.getHistory(range);
+      return response.value!;
     }
   }
 
   (List<SensorDataPack>?, SensorHeadData?) getData(body, (DateTime, DateTime) range) {
     final event = jsonDecode(body);
+    
     switch(widget.showType) {
       case ShowType.day: 
         return SensorDataParser.day(event, range);

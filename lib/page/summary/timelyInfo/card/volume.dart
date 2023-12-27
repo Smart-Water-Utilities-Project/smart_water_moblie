@@ -1,8 +1,8 @@
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/core/counter.dart';
-import 'package:smart_water_moblie/page/summary/summary.dart';
-import 'package:smart_water_moblie/page/summary/card/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/summary.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 
 class VolumeCard extends StatefulWidget {
   const VolumeCard({super.key});

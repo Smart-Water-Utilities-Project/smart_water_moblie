@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/core/counter.dart';
-import 'package:smart_water_moblie/page/summary/card/basic.dart';
-import 'package:smart_water_moblie/page/summary/card/indicator.dart';
-import 'package:smart_water_moblie/page/summary/dialog/target.dart';
-import 'package:smart_water_moblie/page/summary/dialog/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
+import 'package:smart_water_moblie/page/settings/card/target.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
 
 class TargetCard extends StatefulWidget {
   const TargetCard({super.key});
@@ -57,12 +57,12 @@ class _TargetCardState extends State<TargetCard> {
             ]
           )
         ),
-        button: const Icon(Icons.more_vert,
-          size: 27, color: Colors.red
-        ),
-        onTap: () => launchDialog(
-          context, 500, const TargetDialog()
-        ),
+        // button: const Icon(Icons.more_vert,
+        //   size: 27, color: Colors.red
+        // ),
+        // onTap: () => launchDialog(
+        //   context, 500, const TargetSettings()
+        // ),
       )
     );
   }

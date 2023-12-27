@@ -1,9 +1,6 @@
-import 'dart:io';
-import 'package:async/async.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:smart_water_moblie/core/api.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
 
 class DataViewDialog {
   late final BuildContext context;
@@ -59,26 +56,29 @@ class _ServerInitializeState extends State<ServerInitialize> {
   void connectWS() async {
     final String addr = addrTextController.value.text;
     final String port = portTextController.value.text;
-    errorLore = await WebSocketAPI.instance.connect("$addr:$port");
+    errorLore = await SmartWaterAPI.instance.connect("$addr:$port");
   }
 
   String doneString() {
-    switch(WebSocketAPI.instance.state.value.index){
-      case 1: return "完成";
-      case 3: return "連線中";
+    switch(SmartWaterAPI.instance.state.value){
+      case ConnectionStatus.successful: return "完成";
+      case ConnectionStatus.connecting: return "連線中";
+      case ConnectionStatus.never: return "連線";
+      
+      default: return "連線";
     }
 
-    return "連線";
+    
   }
 
   Function()? getOnCencel() {
-    final state = WebSocketAPI.instance.state.value;
+    final state = SmartWaterAPI.instance.state.value;
     switch(state) {
       case ConnectionStatus.successful: return () {
-        WebSocketAPI.instance.resetConnection();
+        SmartWaterAPI.instance.resetConnection();
       };
       default: return () {
-        WebSocketAPI.instance.connection?.cancel();
+        SmartWaterAPI.instance.connection?.cancel();
         Navigator.pop(context);
       };
     }
@@ -87,11 +87,11 @@ class _ServerInitializeState extends State<ServerInitialize> {
   Function()? getOnDone() {
     final String addr = addrTextController.text;
     final String port = portTextController.text;
-    final socketValue = WebSocketAPI.instance.state.value;
+    final socketValue = SmartWaterAPI.instance.state.value;
     if (addr.isEmpty || port.isEmpty || socketValue == ConnectionStatus.connecting) {
       return null;
     }
-    if (WebSocketAPI.instance.state.value == ConnectionStatus.successful) {
+    if (SmartWaterAPI.instance.state.value == ConnectionStatus.successful) {
       return Navigator.of(context).pop;
     }
     if (mounted) {
@@ -100,13 +100,13 @@ class _ServerInitializeState extends State<ServerInitialize> {
     return null;
   }
 
-  final socketState = WebSocketAPI.instance.state;
+  final socketState = SmartWaterAPI.instance.state;
   
   @override
   Widget build(BuildContext context) {
     final List<Widget> widgetList = [
       ListenableBuilder(
-        listenable: WebSocketAPI.instance.state,
+        listenable: SmartWaterAPI.instance.state,
         builder: (context, child) => HeadingBar(
           cancelText: "取消",
           title: "連線至伺服器",
@@ -139,25 +139,33 @@ class _ServerInitializeState extends State<ServerInitialize> {
       )
     ];
 
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15),
-          topRight: Radius.circular(15)
-        )
-      ),
-      child: Scaffold(
-        appBar: AppBar(elevation: 0, toolbarHeight: 0),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: ListView.separated(
-            itemBuilder: (context, index) => widgetList[index],
-            separatorBuilder:(context, index) => const SizedBox(height: 10),
-            itemCount: widgetList.length
+    return GestureDetector(
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(15),
+            topRight: Radius.circular(15)
+          )
+        ),
+        child: Scaffold(
+          appBar: AppBar(elevation: 0, toolbarHeight: 0),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: ListView.separated(
+              itemBuilder: (context, index) => widgetList[index],
+              separatorBuilder:(context, index) => const SizedBox(height: 10),
+              itemCount: widgetList.length
+            )
           )
         )
-      )
+      ),
+      onTap: () {
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
     );
   }
 }
@@ -327,6 +335,7 @@ class _InfoBoxState extends State<InfoBox> {
         if (widget.errorLore == null) {
           return "尚未連接至伺服器";
         } else {return widget.errorLore??'';}
+        
       default: return "尚未連接至伺服器";
     }
   }
@@ -373,7 +382,7 @@ class _InfoBoxState extends State<InfoBox> {
             ],
           ),
           (
-            WebSocketAPI.instance.state.value == ConnectionStatus.connecting
+            SmartWaterAPI.instance.state.value == ConnectionStatus.connecting
           ) ? const LinearProgressIndicator() : const SizedBox.shrink()
         ]
       )

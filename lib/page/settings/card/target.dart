@@ -1,37 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:smart_water_moblie/page/summary/dialog/basic.dart';
 
-class TargetDialog extends StatefulWidget {
-  const TargetDialog({super.key});
+import 'package:smart_water_moblie/core/firebase_msg.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
+
+class TargetSettings extends StatefulWidget {
+  const TargetSettings({super.key});
 
   @override
-  State<TargetDialog> createState() => _TargetDialogState();
+  State<TargetSettings> createState() => _TargetSettingsState();
 }
 
-class _TargetDialogState extends State<TargetDialog> {
+class _TargetSettingsState extends State<TargetSettings> {
+  String? errorMsg = "等待伺服器連線...";
   double sliderValue = 0;
+  bool enableNotifty = false;
   
+  void updateFromServer() async {
+    final response = await SmartWaterAPI.instance.getTarget();
+    if(!mounted) return;
+    if (response.errorMsg != null) {
+      sliderValue = 0;
+      errorMsg = response.errorMsg;
+      setState(() => errorMsg=response.errorMsg);
+      return;
+    }
+
+    errorMsg = null;
+    response.value = (
+      (response.value!.$1 < 0) ? 0 : response.value!.$1,
+      (response.value!.$2 < 0) ? 0 : response.value!.$2
+    );
+
+    // print(response.value);
+    sliderValue = response.value!.$1 / 100;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateFromServer();
+    SmartWaterAPI.instance.state.addListener(updateFromServer);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SmartWaterAPI.instance.state.removeListener(updateFromServer);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10, vertical: 10
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: themeData.inputDecorationTheme.fillColor
+        color: themeData.colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(15)
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const NavigationPill(),
-          const DialogHeading(
-            icon: Icons.ads_click,
-            title: "用水目標設定"
+          TargetHeading(
+            errorMsg: errorMsg
           ),
           const SizedBox(height: 10),
           Padding(
@@ -56,15 +92,27 @@ class _TargetDialogState extends State<TargetDialog> {
           ),
           Slider(
             value: sliderValue,
-            onChanged: (value) {
+            inactiveColor: Colors.grey,
+            onChanged: (errorMsg != null) ? null : (value) {
               setState(() => sliderValue = value);
             },
-            inactiveColor: Colors.grey
+            onChangeEnd: (value) async {
+              SmartWaterAPI.instance.setTarget(
+                daily: (value*100).ceil()
+              );
+            },
           ),
           FancySwitch(
-            title: "開啟用水目標通知",
-            isEnable: true
-          )
+            title: "啟用目標通知",
+            isEnable: enableNotifty,
+            lore: "當用水量接近設定的目標時發送通知",
+            onChange: (value) {
+              FireBaseAPI.instance.toggleWaterLimitNotify(value)
+                .onError((error, stackTrace) => print("setLimitNotify ERROR"));
+              setState(() => enableNotifty = value);
+            }
+          ),
+          const SizedBox(height: 10)
         ]
       )
     );
@@ -149,8 +197,8 @@ class _CircularIndicatorState extends State<CircularIndicator> with SingleTicker
     super.initState();
     controller = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
     animation =
-        ColorTween(begin: Colors.blue, end: Colors.blue).animate(controller)
-          ..addListener(setStateSafe);
+      ColorTween(begin: Colors.blue, end: Colors.blue).animate(controller)
+        ..addListener(setStateSafe);
   }
 
   @override
@@ -199,7 +247,7 @@ class _CircularIndicatorState extends State<CircularIndicator> with SingleTicker
       children: [
         SizedBox.expand(
           child: Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: CircularProgressIndicator(
               strokeAlign: 1,
               strokeWidth: 10,
@@ -224,6 +272,28 @@ class _CircularIndicatorState extends State<CircularIndicator> with SingleTicker
             )
           ]
         )
+      ]
+    );
+  }
+}
+
+class TargetHeading extends StatelessWidget {
+  const TargetHeading({
+    super.key,
+    required this.errorMsg
+  });
+
+  final String? errorMsg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.ads_click, size: 35),
+        const SizedBox(width: 5),
+        const Text("用水目標設定"),
+        const Spacer(),
+        WarnningButton(errorMsg: errorMsg)
       ]
     );
   }

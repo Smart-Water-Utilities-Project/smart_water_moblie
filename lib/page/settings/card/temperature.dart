@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:smart_water_moblie/core/firebase_msg.dart';
-import 'package:smart_water_moblie/page/summary/dialog/basic.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
 
-class TempertureDialog extends StatefulWidget {
-  const TempertureDialog({super.key});
+class TempertureSettings extends StatefulWidget {
+  const TempertureSettings({super.key});
 
   @override
-  State<TempertureDialog> createState() => _TempertureDialogState();
+  State<TempertureSettings> createState() => _TempertureSettingsState();
 }
 
-class _TempertureDialogState extends State<TempertureDialog> {
+class _TempertureSettingsState extends State<TempertureSettings> {
   bool temperatureCaution = false;
 
   @override
@@ -36,16 +36,16 @@ class _TempertureDialogState extends State<TempertureDialog> {
         horizontal: 10, vertical: 10
       ),
       decoration: BoxDecoration(
-        color: themeData.inputDecorationTheme.fillColor
+        color: themeData.colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(15)
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const NavigationPill(),
           const TemperatureHeading(),
           const SizedBox(height: 10),
           FancySwitch(
-            title: "啟用漏水通知",
+            title: "啟用結冰通知",
             isEnable: temperatureCaution,
             lore: "當偵測到溫度接近水的冰點時發送警告訊息",
             onChange: (value) async {
@@ -70,7 +70,7 @@ class TemperatureHeading extends StatelessWidget {
       children: [
         Icon(CupertinoIcons.thermometer, size: 35),
         SizedBox(width: 5),
-        Text("溫度警告")
+        Text("結冰警告")
       ]
     );
   }

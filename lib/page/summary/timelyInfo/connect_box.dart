@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:smart_water_moblie/core/api.dart';
-import 'package:smart_water_moblie/page/settings/connect_dialog.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/page/settings/card/connect.dart';
 class ConnectIndicator extends StatefulWidget {
   const ConnectIndicator({super.key});
 
@@ -14,7 +14,7 @@ class _ConnectIndicatorState extends State<ConnectIndicator>
   bool isHide = false;
   
   void popDialog() {
-    WebSocketAPI.instance.resetConnection();
+    SmartWaterAPI.instance.resetConnection();
     
     final animationController = AnimationController(
       vsync: this,
@@ -33,11 +33,11 @@ class _ConnectIndicatorState extends State<ConnectIndicator>
   Widget build(BuildContext context) {
     super.build(context);
     return ListenableBuilder(
-      listenable: WebSocketAPI.instance.state,
+      listenable: SmartWaterAPI.instance.state,
       builder: (context, child) => ListenableBuilder(
-        listenable: WebSocketAPI.instance.retryCount,
+        listenable: SmartWaterAPI.instance.retryCount,
         builder: (context, child) {
-          ConnectionStatus status = WebSocketAPI.instance.state.value;
+          ConnectionStatus status = SmartWaterAPI.instance.state.value;
           if (status == ConnectionStatus.successful) {
             Future.delayed(const Duration(seconds: 3))
             .then((value) {
@@ -91,7 +91,7 @@ class ConnectingBox extends StatelessWidget {
       Container(
         alignment: Alignment.bottomCenter,
         child: Text(
-          WebSocketAPI.instance.retryCount.value.toString(),
+          SmartWaterAPI.instance.retryCount.value.toString(),
           style: themeData.textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.bold
           )
@@ -123,7 +123,7 @@ class ConnectingBox extends StatelessWidget {
             style:  themeData.textTheme.labelMedium,
           ),
           onPressed: () async {
-            await WebSocketAPI.instance.reteyConnect(url: "192.168.1.110:5678");
+            await SmartWaterAPI.instance.reteyConnect(url: "192.168.1.110:5678");
           }
         )
       )

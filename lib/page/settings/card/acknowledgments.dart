@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Acknowledgements extends StatelessWidget {
@@ -53,7 +53,7 @@ class Acknowledgements extends StatelessWidget {
   }
 }
 
-class PersonCard extends StatelessWidget {
+class PersonCard extends StatefulWidget {
   const PersonCard({
     super.key,
     required this.name,
@@ -66,7 +66,17 @@ class PersonCard extends StatelessWidget {
   final String name;
   final String image;
   final String message;
-  
+
+  @override
+  State<PersonCard> createState() => _PersonCardState();
+}
+
+class _PersonCardState extends State<PersonCard> {
+  ToastificationItem toast = ToastificationItem(
+    builder: (context, a) => const SizedBox(),
+    alignment: Alignment.bottomCenter,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -81,31 +91,32 @@ class PersonCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(1000)
             ),
-            child: Image.asset(image),
+            child: Image.asset(widget.image),
           ),
           const SizedBox(width: 10),
-          Text(name),
+          Text(widget.name),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.chat),
             onPressed: () {
-              Fluttertoast.showToast(
-                msg: message,
-                fontSize: 16.0,
-                timeInSecForIosWeb: 1,
-                textColor: Colors.white,
-                gravity: ToastGravity.BOTTOM,
-                toastLength: Toast.LENGTH_SHORT,
-                backgroundColor: Colors.grey.shade800
+              if (toast.isRunning) return;
+              toast = toastification.show(
+                context: context,
+                pauseOnHover: true,
+                showProgressBar: false,
+                title: widget.message,
+                autoCloseDuration: const Duration(seconds: 5),
+                type: ToastificationType.info,
+                alignment: Alignment.bottomCenter,
               );
             }, 
           ),
           IconButton(
             icon: const Icon(Icons.open_in_browser_outlined),
             onPressed: () async {
-              final Uri uri = Uri.parse(url);
+              final Uri uri = Uri.parse(widget.url);
               if (!await launchUrl(uri)) {
-                throw Exception('Could not launch $url');
+                throw Exception('Could not launch ${widget.url}');
               }
             }, 
           )

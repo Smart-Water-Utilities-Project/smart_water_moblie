@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:smart_water_moblie/page/settings/acknowledgments.dart';
+import 'dart:ui';
 
-import 'package:smart_water_moblie/page/settings/demo_section.dart';
-import 'package:smart_water_moblie/page/settings/theme_section.dart';
-import 'package:smart_water_moblie/page/settings/server_section.dart';
+import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/page/settings/card/acknowledgments.dart';
+
+import 'package:smart_water_moblie/page/settings/card/demo.dart';
+import 'package:smart_water_moblie/page/settings/card/leakage.dart';
+import 'package:smart_water_moblie/page/settings/card/target.dart';
+import 'package:smart_water_moblie/page/settings/card/temperature.dart';
+import 'package:smart_water_moblie/page/settings/card/theme.dart';
+import 'package:smart_water_moblie/page/settings/card/server.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -16,15 +21,36 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
+  
     List<Widget> listView = const [
       ServerSection(),
+      LeakageSettings(),
+      TargetSettings(),
+      TempertureSettings(),
       ThemeSection(),
       DemoSection(),
-      Acknowledgements()
+      Acknowledgements(),
     ];
 
     return Scaffold(
-      appBar: AppBar(elevation: 0, toolbarHeight: 0),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        surfaceTintColor: themeData.colorScheme.background,
+        backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
+        title: Text("設定",
+          style: themeData.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold
+          )
+        ),
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+            child: Container(color: Colors.transparent)
+          )
+        )
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -32,10 +58,6 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: Text('設定', style: TextStyle(fontSize: 40))
-              ),
               Expanded(
                 child: ListView.separated(
                   itemCount: listView.length,

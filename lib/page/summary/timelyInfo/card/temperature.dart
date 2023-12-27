@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/core/counter.dart';
-import 'package:smart_water_moblie/page/summary/card/basic.dart';
-import 'package:smart_water_moblie/page/summary/card/indicator.dart';
-import 'package:smart_water_moblie/page/summary/dialog/temperature.dart';
-import 'package:smart_water_moblie/page/summary/dialog/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
+import 'package:smart_water_moblie/page/settings/card/temperature.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
 
 class TemperatureCard extends StatefulWidget {
   const TemperatureCard({
@@ -45,12 +45,12 @@ class _TemperatureCardState extends State<TemperatureCard> {
             listenable: Controller.temp,
           )
         ),
-        onTap: () => launchDialog(
-          context, 200, const TempertureDialog()
-        ),
-        button: const Icon(Icons.more_horiz,
-          size: 27, color: Colors.orange
-        )
+        // onTap: () => launchDialog(
+        //   context, 200, const TempertureSettings()
+        // ),
+        // button: const Icon(Icons.more_horiz,
+        //   size: 27, color: Colors.orange
+        // )
       )
     );
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/page/volume/volume.dart';
-import 'package:smart_water_moblie/page/summary/card/basic.dart';
-import 'package:smart_water_moblie/page/summary/card/indicator.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
 
 class UsageCard extends StatefulWidget {
   const UsageCard({super.key});

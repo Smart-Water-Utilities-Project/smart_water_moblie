@@ -24,9 +24,9 @@ class ArticleCover extends StatelessWidget {
             children: [
               Expanded(
                 child: Ink.image(
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.fitWidth,
                   image: const NetworkImage(
-                    "https://pgw.udn.com.tw/gw/photo.php?u=https://uc.udn.com.tw/photo/2023/12/19/realtime/28384171.jpg&x=0&y=0&sw=0&sh=0&sl=W&fw=800&exp=3600",
+                    "https://www-ws.wra.gov.tw/001/Upload/401/relpic/9029/7241/3ccad84a-cd88-4eb6-9e17-5b3cfc38fce0.png",
                   )
                 )
                 
@@ -43,9 +43,8 @@ class ArticleCover extends StatelessWidget {
                       child: Text(lore, style: themeData.textTheme.labelMedium,)
                     )
                   ]
-                ),
+                )
               )
-              
             ]
           ),
           onTap: () {},

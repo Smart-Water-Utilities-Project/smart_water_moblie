@@ -22,7 +22,35 @@ class FireBaseAPI {
       await instance.unsubscribeFromTopic("waterLeakage");
     }
   }
+
+  Future<void> toggleWaterLimitNotify(bool value) async {
+    final instance = FirebaseMessaging.instance;
+    if (value) {
+      await instance.subscribeToTopic("waterLimit");
+    } else {
+      await instance.unsubscribeFromTopic("waterLimit");
+    }
+  }
+
+  Future<void> togglePipeFreezeNotify(bool value) async {
+    final instance = FirebaseMessaging.instance;
+    if (value) {
+      await instance.subscribeToTopic("PipeFreeze");
+    } else {
+      await instance.unsubscribeFromTopic("PipeFreeze");
+    }
+  }
   
+  Future<void> toggleDevTestNotify(bool value) async {
+    final instance = FirebaseMessaging.instance;
+    print("object");
+    if (value) {
+      await instance.subscribeToTopic("devTest");
+    } else {
+      await instance.unsubscribeFromTopic("devTest");
+    }
+  }
+
   Future<void> initNotification() async {
     final prefs = await SharedPreferences.getInstance();
     await Firebase.initializeApp();
@@ -70,7 +98,7 @@ class FireBaseAPI {
     final topic = message.from;
     print(topic);
     switch(topic) {
-      case "/topics/waterLeakage": {
+      default: {
         NotificationAPI.instance.showBigTextNotification(
           title: message.notification?.title ?? "", 
           body: message.notification?.body ?? ""

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 void launchDialog(BuildContext context, double height, Widget child) {
   final themeData = Theme.of(context);
@@ -24,28 +25,6 @@ void launchDialog(BuildContext context, double height, Widget child) {
   );
 }
 
-class DialogHeading extends StatelessWidget {
-  const DialogHeading({
-    super.key,
-    required this.title,
-    required this.icon
-  });
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 35),
-        const SizedBox(width: 5),
-        Text(title)
-      ]
-    );
-  }
-}
-
 class FancySwitch extends StatefulWidget {
   const FancySwitch({
     super.key,
@@ -68,7 +47,7 @@ class _FancySwitchState extends State<FancySwitch> {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-
+    
     final loreText = [
       const SizedBox(height: 5),
       Flexible(
@@ -84,8 +63,10 @@ class _FancySwitchState extends State<FancySwitch> {
     return Material(
       clipBehavior: Clip.hardEdge,
       borderRadius: BorderRadius.circular(15),
-      color: themeData.inputDecorationTheme.fillColor,
+      color: Colors.transparent,
       child: InkWell(
+        onTap: (widget.onChange == null) ? 
+          null : () => widget.onChange?.call(!widget.isEnable),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             child: Row(
@@ -96,7 +77,9 @@ class _FancySwitchState extends State<FancySwitch> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.title),
+                  Text(widget.title, style: TextStyle(
+                    color: (widget.onChange == null) ? Colors.grey : null
+                  )),
                   (widget.lore == null) ? const SizedBox() : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: loreText
@@ -111,8 +94,7 @@ class _FancySwitchState extends State<FancySwitch> {
               )
             ]
           )
-        ),
-        onTap: () => widget.onChange?.call(!widget.isEnable)
+        )
       )
     );
   }
@@ -137,6 +119,53 @@ class NavigationPill extends StatelessWidget {
           ),
         )
       )
+    );
+  }
+}
+
+class WarnningButton extends StatefulWidget {
+  const WarnningButton({
+    super.key,
+    required this.errorMsg
+  });
+
+  final String? errorMsg;
+
+  @override
+  State<WarnningButton> createState() => _WarnningButtonState();
+}
+
+class _WarnningButtonState extends State<WarnningButton> {
+  ToastificationItem toast = ToastificationItem(
+    builder: (context, a) => const SizedBox(),
+    alignment: Alignment.bottomCenter,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.errorMsg == null) {
+      return const SizedBox(height: 50);
+    }
+
+    return IconButton(
+      icon: const Icon(
+        Icons.warning_rounded,
+        size: 30,
+        color: Colors.yellow
+      ),
+      onPressed: () {
+        if (toast.isRunning) return;
+
+        toast = toastification.show(
+          context: context,
+          pauseOnHover: true,
+          showProgressBar: false,
+          title: "${widget.errorMsg}",
+          autoCloseDuration: const Duration(seconds: 5),
+          type: ToastificationType.error,
+          alignment: Alignment.bottomCenter
+        );
+      }
     );
   }
 }
