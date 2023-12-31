@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
 import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,21 +11,17 @@ class Acknowledgements extends StatelessWidget {
     final themeData = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 5, 10 ,10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: themeData.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(10)
       ),
       child: const Column(
         children: [
-          Row(
-            children: [
-              Icon(Icons.person, size: 35),
-              SizedBox(width: 5),
-              Text("開發人員名單")
-            ],
+          SectionHeading(
+            title: "開發人員名單",
+            icon: Icons.person
           ),
-          SizedBox(height: 5),
           Column(
             children: [
               PersonCard(
@@ -46,7 +43,8 @@ class Acknowledgements extends StatelessWidget {
                 url: "https://stackoverflow.com/users/11774056/yuva"
               )
             ]
-          )
+          ),
+          SizedBox(height: 10)
         ]
       )
     );

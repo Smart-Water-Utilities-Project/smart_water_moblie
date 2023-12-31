@@ -1,60 +1,26 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:smart_water_moblie/core/firebase_msg.dart';
-import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/settings/basic.dart';
+import 'package:smart_water_moblie/page/settings/card/connect.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
+import 'package:smart_water_moblie/provider/property.dart';
 
-class TargetSettings extends StatefulWidget {
-  const TargetSettings({super.key});
+class TargetSection extends StatefulWidget {
+  const TargetSection({super.key});
 
   @override
-  State<TargetSettings> createState() => _TargetSettingsState();
+  State<TargetSection> createState() => _TargetSectionState();
 }
 
-class _TargetSettingsState extends State<TargetSettings> {
-  String? errorMsg = "等待伺服器連線...";
-  double sliderValue = 0;
-  bool enableNotifty = false;
-  
-  void updateFromServer() async {
-    final response = await SmartWaterAPI.instance.getTarget();
-    if(!mounted) return;
-    if (response.errorMsg != null) {
-      sliderValue = 0;
-      errorMsg = response.errorMsg;
-      setState(() => errorMsg=response.errorMsg);
-      return;
-    }
-
-    errorMsg = null;
-    response.value = (
-      (response.value!.$1 < 0) ? 0 : response.value!.$1,
-      (response.value!.$2 < 0) ? 0 : response.value!.$2
-    );
-
-    // print(response.value);
-    sliderValue = response.value!.$1 / 100;
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    updateFromServer();
-    SmartWaterAPI.instance.state.addListener(updateFromServer);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    SmartWaterAPI.instance.state.removeListener(updateFromServer);
-  }
-
+class _TargetSectionState extends State<TargetSection> {
+  double targetValue = 0;
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
-
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
@@ -62,55 +28,46 @@ class _TargetSettingsState extends State<TargetSettings> {
         borderRadius: BorderRadius.circular(15)
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TargetHeading(
-            errorMsg: errorMsg
+          const SectionHeading(
+            title: "蓄水目標",
+            icon: Icons.water_damage,
           ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: mediaQuery.size.width / 3,
-                  height: mediaQuery.size.width / 3,
-                  child: CircularIndicator(percent: sliderValue),
-                ),
-                const Spacer(),
-                SizedBox(
-                  height: mediaQuery.size.width / 3,
-                  child: CostsIndicator(percent: sliderValue)
+          Row(
+            children: [
+              const SizedBox(width: 20),
+              WaterBottle(
+                levelPercent: targetValue,
+                width: mediaQuery.size.width / 3,
+                height: mediaQuery.size.width / 3,
+                controller: PageController(initialPage: 1),
+                duration: const Duration(milliseconds: 0)
+              ),
+              SizedBox(
+                width: mediaQuery.size.width / 1.5 - 90,
+                child: Center(
+                  child: VolumeIndicator(percent: targetValue)
                 )
-              ]
-            )
+              ),
+              const SizedBox(width: 20),
+            ]
           ),
           Slider(
-            value: sliderValue,
-            inactiveColor: Colors.grey,
-            onChanged: (errorMsg != null) ? null : (value) {
-              setState(() => sliderValue = value);
-            },
-            onChangeEnd: (value) async {
-              SmartWaterAPI.instance.setTarget(
-                daily: (value*100).ceil()
-              );
-            },
-          ),
-          FancySwitch(
-            title: "啟用目標通知",
-            isEnable: enableNotifty,
-            lore: "當用水量接近設定的目標時發送通知",
-            onChange: (value) {
-              FireBaseAPI.instance.toggleWaterLimitNotify(value)
-                .onError((error, stackTrace) => print("setLimitNotify ERROR"));
-              setState(() => enableNotifty = value);
+            value: targetValue,
+            onChanged: (value) {
+              setState(() => targetValue = value);
             }
+          ),
+          TextButton(
+            onPressed: () => showCupertinoDialog(
+              barrierDismissible: true,
+              context: context,
+              builder: (context) => const SizeDialog()
+            ),
+            style: const ButtonStyle(
+              padding: MaterialStatePropertyAll(EdgeInsets.fromLTRB(10, 3, 10, 5))
+            ),
+            child: Text("變更水塔大小", style: themeData.textTheme.labelMedium)
           ),
           const SizedBox(height: 10)
         ]
@@ -119,22 +76,18 @@ class _TargetSettingsState extends State<TargetSettings> {
   }
 }
 
-class CostsIndicator extends StatelessWidget {
-  const CostsIndicator({
+class VolumeIndicator extends StatelessWidget {
+  const VolumeIndicator({
     super.key,
     required this.percent
   });
 
   final double percent;
 
-  int getCosts() {
-    final usageL = (percent*100).ceil(); // Water usage in L
-
-    if (usageL <= 10.0) return (usageL*7.35 - 0).round();
-    if (usageL <= 30.0) return (usageL*9.45 - 21).round();
-    if (usageL <= 50) return (usageL*11.55 - 84).round();
-
-    return (usageL*12.075 - 110.25).round();
+  double getVolume() {
+    final area = propertyProvider.bottomArea;
+    final height = propertyProvider.maxHeight;
+    return percent * area * height / 1000;
   }
 
   @override
@@ -148,12 +101,7 @@ class CostsIndicator extends StatelessWidget {
         RichText(
           text: TextSpan(
             children: [
-              TextSpan(text: "預計水費", style: themeData.textTheme.titleSmall),
-              const TextSpan(text: " "),
-              TextSpan(text: "(每月)", style: themeData.textTheme.bodySmall?.copyWith(
-                fontSize: 14,
-                color: Colors.grey
-              ))
+              TextSpan(text: "估計儲水量", style: themeData.textTheme.titleSmall),
             ]
           ),
         ),
@@ -164,7 +112,7 @@ class CostsIndicator extends StatelessWidget {
             color: Colors.green,
             borderRadius: BorderRadius.circular(5)
           ),
-          child: Text("NT${getCosts()}", style: themeData.textTheme.labelLarge?.copyWith(
+          child: Text("${getVolume().toStringAsFixed(1)}公升", style: themeData.textTheme.labelLarge?.copyWith(
             fontSize: 40
           ))
         )
@@ -173,128 +121,83 @@ class CostsIndicator extends StatelessWidget {
   }
 }
 
-class CircularIndicator extends StatefulWidget {
-  const CircularIndicator({
-    super.key,
-    required this.percent,
-  });
-
-  final double percent;
+class SizeDialog extends StatefulWidget {
+  const SizeDialog({super.key});
 
   @override
-  State<CircularIndicator> createState() => _CircularIndicatorState();
+  State<SizeDialog> createState() => _SizeDialogState();
 }
 
-class _CircularIndicatorState extends State<CircularIndicator> with SingleTickerProviderStateMixin {
-  late MaterialColor lastColor = Colors.blue;
-  late Animation<Color?> animation;
-  late AnimationController controller;
-  
-  void setStateSafe() => {if (mounted) {setState(() {})}};
+class _SizeDialogState extends State<SizeDialog> {
+  final maxHeight = TextEditingController(text: "${propertyProvider.maxHeight}");
+  final bottomArea = TextEditingController(text: "${propertyProvider.bottomArea}");
 
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(duration: const Duration(milliseconds: 150), vsync: this);
-    animation =
-      ColorTween(begin: Colors.blue, end: Colors.blue).animate(controller)
-        ..addListener(setStateSafe);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    animation.removeListener(setStateSafe);
-  }
-  
-  void colorAnimate(MaterialColor end) {
-    if (lastColor == end) return;
-    controller.value = (0);
-    animation = ColorTween(begin: lastColor, end: end).animate(controller)
-      ..addListener(() {
-        
-      });
-      
-    controller.forward();
-  }
-
-  MaterialColor getColor() {
-    final usageL = (widget.percent*100).ceil(); // Water usage in L
-    if (usageL <= 10.0) {
-      colorAnimate(Colors.blue);
-      return Colors.blue;
-    }
-    if (usageL <= 30.0) {
-      colorAnimate(Colors.yellow);
-      return Colors.yellow;
-    }
-    if (usageL <= 50) {
-      colorAnimate(Colors.orange);
-      return Colors.orange;
-    }
-
-    colorAnimate(Colors.red);
-    return Colors.red;
   }
 
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-    lastColor = getColor();
+    final mediaQuery = MediaQuery.of(context);
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        SizedBox.expand(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: CircularProgressIndicator(
-              strokeAlign: 1,
-              strokeWidth: 10,
-              valueColor: animation,
-              value: widget.percent,
-              strokeCap: StrokeCap.round,
-              backgroundColor: Colors.grey,
-            )
-          )
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
+    return GestureDetector(
+      child: AlertDialog(
+        title: const Text('變更水塔規格'),
+        backgroundColor: Colors.black,
+        surfaceTintColor: Colors.transparent,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(((widget.percent*100).ceil()).toStringAsFixed(0),
-              style: themeData.textTheme.titleLarge),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(5, 0, 0, 5),
-              child: Text("度/月", style: themeData.textTheme.labelMedium?.copyWith(
-                color: Colors.grey
-              )),
+            SizedBox(
+              width: mediaQuery.size.width / 1.4,
+              height: mediaQuery.textScaler.scale(40),
+              child: TextBox(
+                title: "底面積",
+                onlyDouble: true,
+                suffixString: "cm²",
+                controller: bottomArea
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: mediaQuery.size.width / 1.4,
+              height: mediaQuery.textScaler.scale(40),
+              child: TextBox(
+                title: "最高水位",
+                onlyDouble: true,
+                suffixString: "cm",
+                controller: maxHeight
+              ),
             )
           ]
-        )
-      ]
-    );
-  }
-}
-
-class TargetHeading extends StatelessWidget {
-  const TargetHeading({
-    super.key,
-    required this.errorMsg
-  });
-
-  final String? errorMsg;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Icon(Icons.ads_click, size: 35),
-        const SizedBox(width: 5),
-        const Text("用水目標設定"),
-        const Spacer(),
-        WarnningButton(errorMsg: errorMsg)
-      ]
+        ),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              textStyle: Theme.of(context).textTheme.labelLarge,
+            ),
+            child: Text('保存變更', style: themeData.textTheme.labelMedium?.copyWith(
+              color: Colors.blue
+            )),
+            onPressed: () {
+              propertyProvider.setTankSize(
+                area: double.tryParse(bottomArea.value.text),
+                height: double.tryParse(maxHeight.value.text)
+              );
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+      onTap: () {
+        final currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      }
     );
   }
 }

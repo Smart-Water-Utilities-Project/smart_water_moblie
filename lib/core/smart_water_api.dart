@@ -244,6 +244,12 @@ class SmartWaterAPI{
         errorMsg: "無法連線至伺服器",
         statusCode: result.statusCode,
       );
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "伺服器連線逾時",
+        statusCode: 100,
+      );
     }
   }
 
@@ -272,6 +278,12 @@ class SmartWaterAPI{
         statusCode: 100,
         errorMsg: "無法連線至伺服器",
       );
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "伺服器連線逾時",
+        statusCode: 100,
+      );
     }
   }
 
@@ -289,7 +301,6 @@ class SmartWaterAPI{
 
     try{
       final result = await http.put(uri, body: payload);
-      
       if (result.body.isNotEmpty) {
         return HttpAPIResponse(
           value: !value,
@@ -308,6 +319,12 @@ class SmartWaterAPI{
         value: !value,
         statusCode: 100,
         errorMsg: "尚未連線至伺服器",
+      );
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse(
+        value: false,
+        errorMsg: "伺服器連線逾時",
+        statusCode: 100,
       );
     }
   }
@@ -340,6 +357,12 @@ class SmartWaterAPI{
         errorMsg: "無法連線至伺服器",
         statusCode: 100,
       );
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "伺服器連線逾時",
+        statusCode: 100,
+      );
     }
   }
 
@@ -369,6 +392,12 @@ class SmartWaterAPI{
       return HttpAPIResponse(
         value: null,
         errorMsg: "無法連線至伺服器",
+        statusCode: 100,
+      );
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse(
+        value: null,
+        errorMsg: "伺服器連線逾時",
         statusCode: 100,
       );
     }

@@ -5,10 +5,11 @@ import 'package:smart_water_moblie/page/settings/card/acknowledgments.dart';
 
 import 'package:smart_water_moblie/page/settings/card/demo.dart';
 import 'package:smart_water_moblie/page/settings/card/leakage.dart';
-import 'package:smart_water_moblie/page/settings/card/target.dart';
+import 'package:smart_water_moblie/page/settings/card/limit.dart';
 import 'package:smart_water_moblie/page/settings/card/temperature.dart';
 import 'package:smart_water_moblie/page/settings/card/theme.dart';
 import 'package:smart_water_moblie/page/settings/card/server.dart';
+import 'package:smart_water_moblie/page/settings/card/target.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -25,12 +26,14 @@ class _SettingsPageState extends State<SettingsPage> {
   
     List<Widget> listView = const [
       ServerSection(),
-      LeakageSettings(),
-      TargetSettings(),
-      TempertureSettings(),
+      LeakageSection(),
+      LimitSection(),
+      TargetSection(),
+      TempertureSection(),
       ThemeSection(),
       DemoSection(),
       Acknowledgements(),
+      SizedBox()
     ];
 
     return Scaffold(

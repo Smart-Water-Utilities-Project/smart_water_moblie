@@ -5,18 +5,20 @@ import 'package:smart_water_moblie/core/demostrate.dart';
 import 'package:smart_water_moblie/core/firebase_msg.dart';
 import 'package:smart_water_moblie/core/local_notification.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/provider/property.dart';
 import 'package:smart_water_moblie/provider/theme.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/summary.dart';
+import 'package:smart_water_moblie/page/summary/summary.dart';
 
 
 GlobalKey appkey = GlobalKey();
 ThemeProvider themeProvider = ThemeProvider();
+PropertyProvider propertyProvider = PropertyProvider();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  await themeProvider.fetch();
   await demoMode.initialize();
+  await themeProvider.fetch();
+  await propertyProvider.fetch();
   await NotificationAPI.instance.initizlize();
   await FireBaseAPI.instance.initNotification();
   SmartWaterAPI.instance.reteyConnect();

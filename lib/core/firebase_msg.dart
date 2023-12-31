@@ -12,7 +12,7 @@ class FireBaseAPI {
     return _instance!;
   }
 
-  String? _token;
+  String? token;
 
   Future<void> toggleWaterLeakNotify(bool value) async {
     final instance = FirebaseMessaging.instance;
@@ -43,7 +43,6 @@ class FireBaseAPI {
   
   Future<void> toggleDevTestNotify(bool value) async {
     final instance = FirebaseMessaging.instance;
-    print("object");
     if (value) {
       await instance.subscribeToTopic("devTest");
     } else {
@@ -58,21 +57,21 @@ class FireBaseAPI {
     await toggleWaterLeakNotify(prefs.getBool("isLeakNotifyEnable")??false);
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    _token = await FirebaseMessaging.instance.getToken();
+    token = await FirebaseMessaging.instance.getToken();
 
-    print("FireBase Token = $_token");
+    // print("FireBase Token = $_token");
 
     FirebaseMessaging.instance.onTokenRefresh
     // This callback is fired at each app startup and whenever a new token is generated.
-    .listen((fcmToken) => _token = fcmToken)
+    .listen((fcmToken) => token = fcmToken)
     // Error getting token.
-    .onError((err) => _token = null);
+    .onError((err) => token = null);
 
     FirebaseMessaging.onMessage.listen(onMessage);
   }
 
   Future<void> reqPermission() async {
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    /*NotificationSettings settings = */ await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -93,10 +92,10 @@ class FireBaseAPI {
   }
 
   static void onMessage(RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
+    // print('Got a message whilst in the foreground!');
 
     final topic = message.from;
-    print(topic);
+    // print(topic);
     switch(topic) {
       default: {
         NotificationAPI.instance.showBigTextNotification(

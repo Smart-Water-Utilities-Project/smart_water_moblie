@@ -169,3 +169,29 @@ class _WarnningButtonState extends State<WarnningButton> {
     );
   }
 }
+
+class SectionHeading extends StatelessWidget {
+  const SectionHeading({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.errorMsg,
+  });
+
+  final String title;
+  final IconData icon;
+  final String? errorMsg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 35),
+        const SizedBox(width: 5),
+        Text(title),
+        const Spacer(),
+        WarnningButton(errorMsg: errorMsg)
+      ]
+    );
+  }
+}

@@ -164,6 +164,7 @@ class _WaterBottleState extends State<WaterBottle> {
     final mediaQuery = MediaQuery.of(context);
 
     return SizedBox(
+      height: widget.height,
       width: widget.width,
       child: PageView.builder(
         controller: widget.controller,
@@ -199,7 +200,7 @@ class _WaterBottleState extends State<WaterBottle> {
               ),
               child: AnimatedContainer(
                 width: mediaQuery.size.width,
-                height: widget.height * level,
+                height: (widget.height - 13) * level,
                 alignment: Alignment.topCenter,
                 color: Colors.blue,
                 curve: Curves.easeInOutSine,

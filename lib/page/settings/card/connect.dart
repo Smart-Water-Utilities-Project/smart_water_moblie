@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:smart_water_moblie/core/smart_water_api.dart';
+
 
 class DataViewDialog {
   late final BuildContext context;
@@ -22,14 +24,16 @@ class DataViewDialog {
     transitionAnimationController: animation,
     backgroundColor: Theme.of(context).colorScheme.background,
     builder: (context) => DraggableScrollableSheet(
-      snap: false,
+      snap: true,
       expand: false,
       maxChildSize: 0.9,
       minChildSize: 0.9,
       initialChildSize: 0.9,
       builder: (context, scrollController) {
         return StatefulBuilder(
-          builder: (context, setState) => const ServerInitialize()
+          builder: (context, setState) => ServerInitialize(
+            scrollController: scrollController
+          )
         );
       }
     )
@@ -37,7 +41,12 @@ class DataViewDialog {
 }
 
 class ServerInitialize extends StatefulWidget {
-  const ServerInitialize({super.key});
+  const ServerInitialize({
+    super.key,
+    this.scrollController
+  });
+
+  final ScrollController? scrollController;
 
   @override
   State<ServerInitialize> createState() => _ServerInitializeState();
@@ -67,7 +76,6 @@ class _ServerInitializeState extends State<ServerInitialize> {
       
       default: return "連線";
     }
-
     
   }
 
@@ -119,7 +127,7 @@ class _ServerInitializeState extends State<ServerInitialize> {
         listenable: socketState,
         builder: (context, child) => TextBox(
           title: "IP位置",
-          controller: addrTextController
+          controller: addrTextController,
         )
       ),
       ListenableBuilder(
@@ -148,15 +156,13 @@ class _ServerInitializeState extends State<ServerInitialize> {
             topRight: Radius.circular(15)
           )
         ),
-        child: Scaffold(
-          appBar: AppBar(elevation: 0, toolbarHeight: 0),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: ListView.separated(
-              itemBuilder: (context, index) => widgetList[index],
-              separatorBuilder:(context, index) => const SizedBox(height: 10),
-              itemCount: widgetList.length
-            )
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ListView.separated(
+            controller: widget.scrollController,
+            itemBuilder: (context, index) => widgetList[index],
+            separatorBuilder:(context, index) => const SizedBox(height: 10),
+            itemCount: widgetList.length
           )
         )
       ),
@@ -245,13 +251,31 @@ class TextBox extends StatelessWidget {
     required this.title,
     required this.controller,
     this.onChanged,
-    this.onlyDigits = false
+    this.onlyDigits = false,
+    this.onlyDouble = false,
+    this.suffixString,
+    this.autofocus
   });
 
   final String title;
-  final bool onlyDigits;
+  final bool onlyDigits, onlyDouble;
+  final bool? autofocus;
+  final String? suffixString;
   final TextEditingController controller;
   final Function(String)? onChanged;
+
+  List<TextInputFormatter>? getInputFormat() {
+    if (onlyDouble) {
+      return [FilteringTextInputFormatter.allow(
+        RegExp(r"(-?\d+(\.\d*)?)|(-?\.\d+)"),
+      )];
+    }
+
+    if (onlyDigits) {
+      return [FilteringTextInputFormatter.digitsOnly];
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -262,14 +286,16 @@ class TextBox extends StatelessWidget {
           width: constraint.maxWidth, 
           child: TextField(
             maxLines: 1,
+            autofocus: autofocus??false,
             autocorrect: false,
             onChanged: onChanged,
             controller: controller,
             enableSuggestions: false,
             style: const TextStyle(fontSize: 18),
             keyboardType: onlyDigits ? TextInputType.number : null,
-            inputFormatters: onlyDigits ? [FilteringTextInputFormatter.digitsOnly] : null,
+            inputFormatters: getInputFormat(),
             decoration: InputDecoration(
+              isDense: true,
               isCollapsed: true,
               border: OutlineInputBorder(
                 borderSide: BorderSide.none,
@@ -289,9 +315,11 @@ class TextBox extends StatelessWidget {
                   )
                 ],
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 15, vertical: 12
-              )
+              contentPadding: const EdgeInsets.fromLTRB(15, 7, 15, 0),
+              suffixIcon: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(" ${suffixString??''}")
+              ),
             )
           )
         );

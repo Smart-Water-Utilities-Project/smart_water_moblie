@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:animated_flip_counter/animated_flip_counter.dart';
+
 import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
-import 'package:smart_water_moblie/page/settings/card/target.dart';
-import 'package:smart_water_moblie/page/settings/basic.dart';
 
 class TargetCard extends StatefulWidget {
   const TargetCard({super.key});
@@ -19,53 +18,132 @@ class _TargetCardState extends State<TargetCard> {
     final mediaQuery = MediaQuery.of(context);
     
     return ListenableBuilder(
-      listenable: Controller.flow,
+      listenable: Controller.level,
       builder: (context, child) => InfoCard(
-        title: '用水量目標',
-        color: Colors.red.shade400,
-        icon: SizedBox(
+        title: '水塔儲水量',
+        color: Colors.yellow,
+        icon: const SizedBox(
           width: 30,
           height: 30,
           child: Icon(
             size: 30,
-            Icons.ads_click,
-            color: Colors.red.shade400,
+            Icons.water_damage,
+            color: Colors.yellow,
           )
         ),
-        widget: SizedBox(
-          width: mediaQuery.size.width - 90,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              RowIndicator(
-                unit: " 公升",
-                fractionDigits: 1,
-                listenable: Controller.level
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5
+        widget: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                AnimatedFlipCounter(
+                  fractionDigits: 1,
+                  value: Controller.level.value,
+                  curve: Curves.easeInOutSine,
+                  duration: const Duration(milliseconds: 600),
+                  textStyle: themeData.textTheme.titleLarge
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(15)
-                ),
-                child: Text("0.1%", style: themeData.textTheme.titleMedium),
-              )
-            ]
-          )
-        ),
-        // button: const Icon(Icons.more_vert,
-        //   size: 27, color: Colors.red
-        // ),
-        // onTap: () => launchDialog(
-        //   context, 500, const TargetSettings()
-        // ),
+                const Text(
+                  " 公升",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey
+                  )
+                )
+              ]
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(width: mediaQuery.size.width-185),
+                SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: WaterBottle(
+                    listenable: Controller.level
+                  )
+                )
+              ]
+            )
+          ]
+        )
       )
     );
   }
 }
 
+class WaterBottle extends StatefulWidget {
+  const WaterBottle({
+    super.key,
+    required this.listenable
+  });
 
+  final CounterModel listenable;
+  @override
+  State<WaterBottle> createState() => _WaterBottleState();
+}
+
+class _WaterBottleState extends State<WaterBottle> {
+
+  @override
+  Widget build(BuildContext context) {
+    final themeData = Theme.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
+    return ListenableBuilder(
+      listenable: widget.listenable,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constant) {
+            final percent = widget.listenable.value / 1000;
+
+            return Container(
+              height: constant.maxHeight,
+              margin: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+              alignment: Alignment.bottomCenter,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10)
+                ),
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.grey.shade800, width: 3.0,
+                  ),
+                  left: BorderSide(
+                    color: Colors.grey.shade800, width: 3.0,
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey.shade800, width: 3.0,
+                  )
+                )
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(7),
+                  bottomRight: Radius.circular(7)
+                ),
+                child: AnimatedContainer(
+                  width: mediaQuery.size.width,
+                  height: (constant.maxHeight-10) * percent,
+                  alignment: Alignment.topCenter,
+                  color: Colors.blue,
+                  curve: Curves.easeInOutSine,
+                  duration: const Duration(milliseconds: 350),
+                  child: Text(
+                    "${(percent*100).toStringAsFixed(1)}%",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold
+                    )
+                  )
+                )
+              )
+            );
+          }
+        );
+      } 
+    );
+  }
+}

@@ -6,16 +6,16 @@ import 'package:smart_water_moblie/core/firebase_msg.dart';
 import 'package:smart_water_moblie/page/settings/basic.dart';
 import 'package:toastification/toastification.dart';
 
-class LeakageSettings extends StatefulWidget {
-  const LeakageSettings({
+class LeakageSection extends StatefulWidget {
+  const LeakageSection({
     super.key,
   });
 
   @override
-  State<LeakageSettings> createState() => LeakageSettingsState();
+  State<LeakageSection> createState() => LeakageSectionState();
 }
 
-class LeakageSettingsState extends State<LeakageSettings> with AutomaticKeepAliveClientMixin {
+class LeakageSectionState extends State<LeakageSection> with AutomaticKeepAliveClientMixin {
   String? errorMsg;
   bool? isVavleOpen;
   bool isNotifyEnable = false;
@@ -90,7 +90,11 @@ class LeakageSettingsState extends State<LeakageSettings> with AutomaticKeepAliv
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          LeakageHeading(errorMsg: errorMsg),
+          SectionHeading(
+            title: "漏水監測",
+            icon: Icons.water_drop,
+            errorMsg: errorMsg
+          ),
           FancySwitch(
             title: "啟用漏水通知",
             isEnable: isNotifyEnable,
@@ -120,26 +124,4 @@ class LeakageSettingsState extends State<LeakageSettings> with AutomaticKeepAliv
   @override
     bool get wantKeepAlive => true;
      
-}
-
-class LeakageHeading extends StatelessWidget {
-  const LeakageHeading({
-    super.key,
-    this.errorMsg
-  });
-
-  final String? errorMsg;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Icon(Icons.water_drop, size: 35),
-        const SizedBox(width: 5),
-        const Text("漏水監測"),
-        const Spacer(),
-        WarnningButton(errorMsg: errorMsg)
-      ]
-    );
-  }
 }

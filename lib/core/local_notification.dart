@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:smart_water_moblie/main.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/summary.dart';
+import 'package:smart_water_moblie/page/summary/summary.dart';
 
 class NotificationAPI {
   NotificationAPI._();

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/flow.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/card/target.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/limit.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/usage.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/card/volume.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/target.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/connect_box.dart';
 
 class TimelyInfo extends StatelessWidget {
@@ -34,9 +34,9 @@ class TimelyInfo extends StatelessWidget {
         const SizedBox(height: 10),
         const UsageCard(),
         const SizedBox(height: 10),
-        const TargetCard(),
+        const LimitCard(),
         const SizedBox(height: 10),
-        const VolumeCard(),
+        const TargetCard(),
       ]
     );
   }

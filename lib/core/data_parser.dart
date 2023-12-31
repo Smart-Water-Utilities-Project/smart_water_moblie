@@ -72,8 +72,8 @@ class SensorDataParser {
       endTs: key.$4
     )).toList();
     
-    final startTsList = allNumbers.where((i) => i.$3 != null).toList();
-    final endTsList = allNumbers.where((i) => i.$4 != null).toList();
+    // final startTsList = allNumbers.where((i) => i.$3 != null).toList();
+    // final endTsList = allNumbers.where((i) => i.$4 != null).toList();
 
     final sensorHeading = SensorHeadData(
       maxWf: maxWf,
@@ -190,7 +190,7 @@ class SensorDataParser {
 
     switch(type) {
       case ShowType.day:
-        final String heading = "${data.startTs!.year}年${data.startTs!.month}月${data.startTs!.day}";
+        // final String heading = "${data.startTs!.year}年${data.startTs!.month}月${data.startTs!.day}";
 
         if (data.startTs!.minute == data.endTs!.minute) {
           return "${data.startTs!.hour}時${data.startTs!.minute}分";

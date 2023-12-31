@@ -1,0 +1,11 @@
+{
+  "type": "container",
+  "args": {
+    "child": {
+      "type": "text",
+      "args": {
+        "text": "TEST"
+      }
+    }
+  }
+}

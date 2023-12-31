@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/page/settings/basic.dart';
 import 'package:smart_water_moblie/page/settings/card/connect.dart';
 
 class ServerSection extends StatefulWidget {
@@ -17,7 +18,7 @@ class _ServerSectionState extends State<ServerSection> {
     final themeData = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: themeData.colorScheme.primaryContainer
@@ -26,15 +27,12 @@ class _ServerSectionState extends State<ServerSection> {
         listenable: SmartWaterAPI.instance.state,
         builder: (context, child) => const Column(
           children: [
-            Row(
-              children: [
-                Icon(Icons.rss_feed, size: 35),
-                SizedBox(width: 5),
-                Text("主機連線")
-              ]
+            SectionHeading(
+              title: "主機連線",
+              icon: Icons.rss_feed
             ),
-            SizedBox(height: 5),
             DetailBox(),
+            SizedBox(height: 10)
           ]
         )
       )
