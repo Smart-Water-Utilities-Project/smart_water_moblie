@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimelyProvider with ChangeNotifier {
-  double _flow = 0, _temp = 0, _level = 0, _summary = 0, _bottomArea = 1, _maxHeight = 1;
+  double _flow = 0, _temp = 0, _level = 0, _summary = 0,
+         _bottomArea = 1, _maxHeight = 1;
 
   double get flow => _flow;
   double get temp => _temp;
