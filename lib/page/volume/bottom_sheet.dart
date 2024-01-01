@@ -45,8 +45,7 @@ class _BottomDetailSheetState extends State<BottomDetailSheet> {
                       ),
                       ...List.generate(
                         50,
-                        (index) => Container(
-                          height: 50, child: Text('Container $index')))
+                        (index) => SizedBox(height: 50, child: Text('Container $index')))
                     ],
                   ),
                 )

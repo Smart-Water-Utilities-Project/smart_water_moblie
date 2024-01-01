@@ -1,10 +1,8 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:smart_water_moblie/core/extension.dart';
@@ -126,14 +124,12 @@ class SmartWaterAPI{
   }
 
   void onData(dynamic event) {
-    switch (event.runtimeType) {
-      case String:
-        final data = jsonDecode(event) as Map<String, dynamic>;
-        switch(data["op"]) { // Check op code
-          case 0: onGeneral(data); break;
-          case 1: onHello(data); break;
-        }
-        break;
+    if (event.runtimeType is String) {
+      final data = jsonDecode(event) as Map<String, dynamic>;
+      switch(data["op"]) { // Check op code
+        case 0: onGeneral(data); break;
+        case 1: onHello(data); break;
+      }
     }
   }
 

@@ -15,7 +15,7 @@ class UsageCard extends StatefulWidget {
 class _UsageCardState extends State<UsageCard> {
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    // final themeData = Theme.of(context);
     
     return ListenableBuilder(
       listenable: timelyProvider,

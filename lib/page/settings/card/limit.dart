@@ -121,7 +121,7 @@ class _LimitSectionState extends State<LimitSection> {
             lore: "當用水量接近設定的目標時發送通知",
             onChange: (value) {
               FireBaseAPI.instance.toggleWaterLimitNotify(value)
-                .onError((error, stackTrace) => print("setLimitNotify ERROR"));
+                .onError((error, stackTrace) => debugPrint("setLimitNotify ERROR"));
               setState(() => enableNotifty = value);
             }
           ),

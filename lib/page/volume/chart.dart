@@ -47,7 +47,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
     final ThemeData themeData = Theme.of(context);
 
     final int index = details.groupingModeInfo!.currentPointIndices.first;
-    final String xValue = details.groupingModeInfo!.points[0].x as String;
+    // final String xValue = details.groupingModeInfo!.points[0].x as String;
     final double yValue = details.groupingModeInfo!.points[0].y as double;
 
     final SensorDataPack dataPack = widget.data[index];
@@ -103,8 +103,8 @@ class _WaterflowChartState extends State<WaterflowChart> {
       plotAreaBorderWidth: 0,
       enableAxisAnimation: true,
       margin: const EdgeInsets.symmetric(vertical: 10),
-      primaryXAxis: CategoryAxis(
-        majorGridLines: const MajorGridLines(width: 0)
+      primaryXAxis: const CategoryAxis(
+        majorGridLines: MajorGridLines(width: 0)
       ),
       primaryYAxis: NumericAxis(
         minimum: 0,

@@ -21,7 +21,7 @@ class NotificationAPI {
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     const initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
     const initializationSettingsLinux = LinuxInitializationSettings(defaultActionName: 'Open notification');
-    final initializationSettingsDarwin = DarwinInitializationSettings(onDidReceiveLocalNotification: (a, b, c, d) => print(a));
+    final initializationSettingsDarwin = DarwinInitializationSettings(onDidReceiveLocalNotification: (a, b, c, d) => debugPrint("$a"));
     final initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
@@ -33,13 +33,13 @@ class NotificationAPI {
       onDidReceiveNotificationResponse: (response) async {
         final context = appkey.currentState?.context;
         if(context == null) {
-          print("context is null");
+          debugPrint("context is null");
           return;
         }
 
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SummaryPage()));
         
-        print(response.payload);
+        debugPrint(response.payload);
       });
   }
 
@@ -68,7 +68,7 @@ class NotificationAPI {
       priority: Priority.high,
     );
 
-    var not= NotificationDetails(android: androidPlatformChannelSpecifics,
+    var not = const NotificationDetails(android: androidPlatformChannelSpecifics,
         // iOS: IOSNotificationDetails()
     );
     await flutterLocalNotificationsPlugin.show(0, title, body, not, payload: "asdasd");

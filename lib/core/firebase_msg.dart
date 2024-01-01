@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_water_moblie/core/local_notification.dart';
 
@@ -107,7 +108,7 @@ class FireBaseAPI {
     message.messageId;
 
     if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
+      debugPrint('Message also contained a notification: ${message.notification}');
     }
   }
 }

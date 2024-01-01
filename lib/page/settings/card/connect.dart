@@ -347,7 +347,7 @@ class _InfoBoxState extends State<InfoBox> {
     final themeData = Theme.of(context);
     switch(widget.result) {
       case ConnectionStatus.failed:
-        print("set error lore => ${widget.errorLore}");
+        debugPrint("set error lore => ${widget.errorLore}");
         if (widget.errorLore != null) { return Colors.red.shade400; }
         return themeData.inputDecorationTheme.fillColor!;
         

@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/main.dart';
 
-import 'package:smart_water_moblie/provider/timely.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
 import 'package:smart_water_moblie/page/summary/article/article.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/timely_info.dart';

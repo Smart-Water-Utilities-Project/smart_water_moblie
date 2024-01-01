@@ -154,7 +154,7 @@ class _WaterBottleState extends State<WaterBottle> {
 
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    // final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
 
     return SizedBox(

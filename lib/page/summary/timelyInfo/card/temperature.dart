@@ -4,8 +4,6 @@ import 'package:smart_water_moblie/main.dart';
 
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
-import 'package:smart_water_moblie/page/settings/card/temperature.dart';
-import 'package:smart_water_moblie/page/settings/basic.dart';
 
 class TemperatureCard extends StatefulWidget {
   const TemperatureCard({
@@ -21,7 +19,7 @@ class TemperatureCard extends StatefulWidget {
 class _TemperatureCardState extends State<TemperatureCard> {
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    // final themeData = Theme.of(context);
     
     return SizedBox(
       width: widget.size,
@@ -160,7 +158,7 @@ class _WaterBottleState extends State<WaterBottle> {
 
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
+    // final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
 
     return SizedBox(

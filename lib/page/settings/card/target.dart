@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
 import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/settings/basic.dart';
 import 'package:smart_water_moblie/page/settings/card/connect.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
-import 'package:smart_water_moblie/provider/timely.dart';
+
 
 class TargetSection extends StatefulWidget {
   const TargetSection({super.key});
