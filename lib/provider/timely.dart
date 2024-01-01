@@ -22,6 +22,8 @@ class TimelyProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  
+
   Future initialize() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _bottomArea = prefs.getDouble('bottomArea') ?? 1;
