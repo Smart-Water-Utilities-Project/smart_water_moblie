@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/main.dart';
 
+import 'package:smart_water_moblie/provider/timely.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
-import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/page/summary/article/article.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/timely_info.dart';
 import 'package:smart_water_moblie/page/settings/settings.dart';
@@ -21,9 +22,11 @@ class _SummaryPageState extends State<SummaryPage>{
   
 
   void onData(Map<String, dynamic> value) {
-    Controller.temp.value = value["wt"]??0;
-    Controller.flow.value = value["wf"]??0;
-    Controller.level.value = value["wl"]??0;
+    timelyProvider.setTimely(
+      temp: value["wt"]??0,
+      flow: value["wf"]??0,
+      level: value["wl"]??0
+    );
     setState(() {});
   }
 

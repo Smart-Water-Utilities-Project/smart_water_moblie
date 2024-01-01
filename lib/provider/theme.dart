@@ -167,6 +167,7 @@ class ThemePack {
     switchTheme: SwitchThemeData(
       // thumbColor: MaterialStateProperty.all(primary),
       trackColor: MaterialStateProperty.resolveWith((states) =>
-      states.contains(MaterialState.selected) ? Colors.blue : Colors.grey))
+      states.contains(MaterialState.selected) ? Colors.blue : Colors.grey)
+    )
   );
 }

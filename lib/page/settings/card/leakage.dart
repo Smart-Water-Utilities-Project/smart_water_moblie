@@ -54,7 +54,7 @@ class LeakageSectionState extends State<LeakageSection> with AutomaticKeepAliveC
     if(mounted) {setState(() {});}
   }
 
-  void processResp(HttpAPIResponse<bool> resp) {
+  void processResp(HttpAPIResponse<bool?> resp) {
     if (resp.errorMsg != null) {
       setState(() => isVavleOpen = null);
       toastification.dismiss(toast);

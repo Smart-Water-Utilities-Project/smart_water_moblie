@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/main.dart';
 
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/flow.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/limit.dart';
-import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/usage.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/target.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/connect_box.dart';
+import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
 
 class TimelyInfo extends StatelessWidget {
   const TimelyInfo({super.key});
@@ -22,12 +23,15 @@ class TimelyInfo extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constant) {
             final width = (constant.maxWidth-10) / 2;
-            return Row(
-              children: [
-                FlowCard(size: width),
-                const SizedBox(width: 10),
-                TemperatureCard(size: width)
-              ]
+            return ListenableBuilder(
+              listenable: timelyProvider,
+                builder: (context, child) => Row(
+                children: [
+                  FlowCard(size: width),
+                  const SizedBox(width: 10),
+                  TemperatureCard(size: width)
+                ]
+              )
             );
           }
         ),

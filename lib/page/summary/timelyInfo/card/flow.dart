@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_water_moblie/core/counter.dart';
+import 'package:smart_water_moblie/main.dart';
 
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
@@ -41,7 +41,7 @@ class _FlowCardState extends State<FlowCard> {
         widget: Expanded(
           child: ColumnIndicator(
             unit: "公升/小時",
-            listenable: Controller.flow,
+            value: timelyProvider.flow,
           )
         ),
         // onTap: () => launchDialog(

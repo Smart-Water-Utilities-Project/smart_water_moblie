@@ -2,8 +2,8 @@ import 'dart:math';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/core/extension.dart';
+import 'package:smart_water_moblie/main.dart';
 
 class DemoMode {
   Timer? timelyUpdateTimer;
@@ -27,16 +27,20 @@ class DemoMode {
       if (timelyUpdateTimer?.isActive ?? false) {return;}
       const oneSec = Duration(milliseconds: 1000);
       timelyUpdateTimer = Timer.periodic(oneSec, (Timer t) {
-        Controller.summary.set(Controller.summary.value + 1.3);
-        Controller.temp.set(Random().nextDouble() * 32);
-        Controller.flow.set(Random().nextInt(1000).toDouble());
-        Controller.level.set(Random().nextInt(1000).toDouble());
+        timelyProvider.setTimely(
+          summary: timelyProvider.summary + 1.3,
+          temp: Random().nextDouble() * 32,
+          flow: Random().nextInt(1000).toDouble(),
+          level: Random().nextDouble() * timelyProvider.maxHeight
+        );
       });
     } else {
-      Controller.summary.set(0);
-      Controller.temp.set(0);
-      Controller.flow.set(0);
-      Controller.level.set(0);
+      timelyProvider.setTimely(
+        summary: 0,
+        temp: 0,
+        flow: 0,
+        level: timelyProvider.maxHeight
+      );
       timelyUpdateTimer?.cancel();
     }
   }

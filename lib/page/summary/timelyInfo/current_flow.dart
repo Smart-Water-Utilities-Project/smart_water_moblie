@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 
-import 'package:smart_water_moblie/core/counter.dart';
+import 'package:smart_water_moblie/main.dart';
 
 class CurrentFlow extends StatefulWidget {
   const CurrentFlow({
@@ -23,7 +23,7 @@ class CurrentFlowState extends State<CurrentFlow> {
 
   void flowListener() {
     // Convert value from L/Hr to ml/sec 
-    currentFlow = Controller.flow.value*1000/3600;
+    currentFlow = timelyProvider.flow*1000/3600;
   }
 
   void onUpdate(Timer timer) {
@@ -34,14 +34,14 @@ class CurrentFlowState extends State<CurrentFlow> {
   @override
   void initState() {
     super.initState();
-    Controller.flow.addListener(flowListener);
+    /*Controller.flow.addListener(flowListener);*/ // ERROR HERE 
     updateTimer = Timer.periodic(const Duration(milliseconds: 750), onUpdate);
   }
 
   @override
   void dispose() {
     super.dispose();
-    Controller.flow.removeListener(flowListener);
+    /*Controller.flow.removeListener(flowListener);*/ // ERROR HERE 
   }
 
   void addVolume(double value) async {
@@ -112,28 +112,23 @@ class FlowIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
-
-    return ListenableBuilder(
-      listenable: Controller.flow,
-      builder: (context, child) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AnimatedFlipCounter(
-            value: Controller.flow.value,
-            curve: Curves.easeInOutSine,
-            duration: const Duration(milliseconds: 600),
-            textStyle: themeData.textTheme.titleLarge
-          ),
-          const Text(
-            " 公升/小時",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.grey
-            )
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AnimatedFlipCounter(
+          value: timelyProvider.flow,
+          curve: Curves.easeInOutSine,
+          duration: const Duration(milliseconds: 600),
+          textStyle: themeData.textTheme.titleLarge
+        ),
+        const Text(
+          " 公升/小時",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey
           )
-        ]
-      )
-      
+        )
+      ]
     );
   }
 }

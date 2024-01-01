@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 
-import 'package:smart_water_moblie/core/counter.dart';
+import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 
 class TargetCard extends StatefulWidget {
@@ -18,7 +18,7 @@ class _TargetCardState extends State<TargetCard> {
     final mediaQuery = MediaQuery.of(context);
     
     return ListenableBuilder(
-      listenable: Controller.level,
+      listenable: timelyProvider,
       builder: (context, child) => InfoCard(
         title: '水塔儲水量',
         color: Colors.yellow,
@@ -39,7 +39,7 @@ class _TargetCardState extends State<TargetCard> {
               children: [
                 AnimatedFlipCounter(
                   fractionDigits: 1,
-                  value: Controller.level.value,
+                  value: (timelyProvider.maxHeight - timelyProvider.level) * timelyProvider.bottomArea,
                   curve: Curves.easeInOutSine,
                   duration: const Duration(milliseconds: 600),
                   textStyle: themeData.textTheme.titleLarge
@@ -62,7 +62,7 @@ class _TargetCardState extends State<TargetCard> {
                   width: 100,
                   height: 100,
                   child: WaterBottle(
-                    listenable: Controller.level
+                    value: (timelyProvider.maxHeight - timelyProvider.level) / timelyProvider.maxHeight
                   )
                 )
               ]
@@ -77,10 +77,10 @@ class _TargetCardState extends State<TargetCard> {
 class WaterBottle extends StatefulWidget {
   const WaterBottle({
     super.key,
-    required this.listenable
+    required this.value
   });
 
-  final CounterModel listenable;
+  final double value;
   @override
   State<WaterBottle> createState() => _WaterBottleState();
 }
@@ -92,58 +92,52 @@ class _WaterBottleState extends State<WaterBottle> {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
 
-    return ListenableBuilder(
-      listenable: widget.listenable,
-      builder: (context, child) {
-        return LayoutBuilder(
-          builder: (context, constant) {
-            final percent = widget.listenable.value / 1000;
+    return LayoutBuilder(
+      builder: (context, constant) {
 
-            return Container(
-              height: constant.maxHeight,
-              margin: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-              alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10)
-                ),
-                border: Border(
-                  right: BorderSide(
-                    color: Colors.grey.shade800, width: 3.0,
-                  ),
-                  left: BorderSide(
-                    color: Colors.grey.shade800, width: 3.0,
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey.shade800, width: 3.0,
-                  )
-                )
+        return Container(
+          height: constant.maxHeight,
+          margin: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+          alignment: Alignment.bottomCenter,
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10)
+            ),
+            border: Border(
+              right: BorderSide(
+                color: Colors.grey.shade800, width: 3.0,
               ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(7),
-                  bottomRight: Radius.circular(7)
-                ),
-                child: AnimatedContainer(
-                  width: mediaQuery.size.width,
-                  height: (constant.maxHeight-10) * percent,
-                  alignment: Alignment.topCenter,
-                  color: Colors.blue,
-                  curve: Curves.easeInOutSine,
-                  duration: const Duration(milliseconds: 350),
-                  child: Text(
-                    "${(percent*100).toStringAsFixed(1)}%",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold
-                    )
-                  )
+              left: BorderSide(
+                color: Colors.grey.shade800, width: 3.0,
+              ),
+              bottom: BorderSide(
+                color: Colors.grey.shade800, width: 3.0,
+              )
+            )
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(7),
+              bottomRight: Radius.circular(7)
+            ),
+            child: AnimatedContainer(
+              width: mediaQuery.size.width,
+              height: (constant.maxHeight-10) * widget.value,
+              alignment: Alignment.topCenter,
+              color: Colors.blue,
+              curve: Curves.easeInOutSine,
+              duration: const Duration(milliseconds: 350),
+              child: Text(
+                "${(widget.value*100).toStringAsFixed(1)}%",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold
                 )
               )
-            );
-          }
+            )
+          )
         );
-      } 
+      }
     );
   }
 }

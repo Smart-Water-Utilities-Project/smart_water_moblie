@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_water_moblie/core/counter.dart';
+
+import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
 
@@ -17,7 +18,7 @@ class _LimitCardState extends State<LimitCard> {
     final mediaQuery = MediaQuery.of(context);
     
     return ListenableBuilder(
-      listenable: Controller.flow,
+      listenable: timelyProvider,
       builder: (context, child) => InfoCard(
         title: '用水量目標',
         color: Colors.red.shade400,
@@ -38,7 +39,7 @@ class _LimitCardState extends State<LimitCard> {
               RowIndicator(
                 unit: " 公升",
                 fractionDigits: 1,
-                listenable: Controller.level
+                value: timelyProvider.level
               ),
               const Spacer(),
               Container(

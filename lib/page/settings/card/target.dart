@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
 import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/settings/basic.dart';
 import 'package:smart_water_moblie/page/settings/card/connect.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/temperature.dart';
-import 'package:smart_water_moblie/provider/property.dart';
+import 'package:smart_water_moblie/provider/timely.dart';
 
 class TargetSection extends StatefulWidget {
   const TargetSection({super.key});
@@ -15,7 +16,38 @@ class TargetSection extends StatefulWidget {
 }
 
 class _TargetSectionState extends State<TargetSection> {
+  String? errorMsg;
   double targetValue = 0;
+  
+  void updateFromServer() async {
+    final response = await SmartWaterAPI.instance.getTarget();
+    if(!mounted) return;
+
+    if (response.errorMsg != null || response.value == null) {
+      targetValue = 0;
+      setState(() => errorMsg=response.errorMsg);
+      return;
+    }
+
+    errorMsg = null;
+    response.value = (response.value! < 0) ? 0 : response.value;
+    targetValue = response.value!;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateFromServer();
+    SmartWaterAPI.instance.state.addListener(updateFromServer);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    SmartWaterAPI.instance.state.removeListener(updateFromServer);
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
@@ -29,9 +61,10 @@ class _TargetSectionState extends State<TargetSection> {
       ),
       child: Column(
         children: [
-          const SectionHeading(
+          SectionHeading(
             title: "蓄水目標",
             icon: Icons.water_damage,
+            errorMsg: errorMsg
           ),
           Row(
             children: [
@@ -54,9 +87,11 @@ class _TargetSectionState extends State<TargetSection> {
           ),
           Slider(
             value: targetValue,
-            onChanged: (value) {
-              setState(() => targetValue = value);
-            }
+            inactiveColor: Colors.grey,
+            onChanged: (errorMsg != null) ? null : (value) =>
+              setState(() => targetValue = value),
+            onChangeEnd: (value) =>
+              SmartWaterAPI.instance.setTarget(target: value)
           ),
           TextButton(
             onPressed: () => showCupertinoDialog(
@@ -85,9 +120,9 @@ class VolumeIndicator extends StatelessWidget {
   final double percent;
 
   double getVolume() {
-    final area = propertyProvider.bottomArea;
-    final height = propertyProvider.maxHeight;
-    return percent * area * height / 1000;
+    final area = timelyProvider.bottomArea;
+    final height = timelyProvider.maxHeight;
+    return percent * area * height;
   }
 
   @override
@@ -112,7 +147,7 @@ class VolumeIndicator extends StatelessWidget {
             color: Colors.green,
             borderRadius: BorderRadius.circular(5)
           ),
-          child: Text("${getVolume().toStringAsFixed(1)}公升", style: themeData.textTheme.labelLarge?.copyWith(
+          child: Text("${getVolume().toStringAsFixed(1)}L", style: themeData.textTheme.labelLarge?.copyWith(
             fontSize: 40
           ))
         )
@@ -129,8 +164,8 @@ class SizeDialog extends StatefulWidget {
 }
 
 class _SizeDialogState extends State<SizeDialog> {
-  final maxHeight = TextEditingController(text: "${propertyProvider.maxHeight}");
-  final bottomArea = TextEditingController(text: "${propertyProvider.bottomArea}");
+  final maxHeight = TextEditingController(text: "${timelyProvider.maxHeight}");
+  final bottomArea = TextEditingController(text: "${timelyProvider.bottomArea}");
 
   @override
   void initState() {
@@ -183,7 +218,7 @@ class _SizeDialogState extends State<SizeDialog> {
               color: Colors.blue
             )),
             onPressed: () {
-              propertyProvider.setTankSize(
+              timelyProvider.setTankSize(
                 area: double.tryParse(bottomArea.value.text),
                 height: double.tryParse(maxHeight.value.text)
               );

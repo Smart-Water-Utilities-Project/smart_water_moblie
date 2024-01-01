@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
@@ -5,8 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:smart_water_moblie/core/extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_water_moblie/page/summary/article/article.dart';
 
 enum ConnectionStatus {
   never,
@@ -224,11 +227,7 @@ class SmartWaterAPI{
     Response result = Response("[]", 100);
 
     if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
-      return HttpAPIResponse(
-        value: result,
-        statusCode: 0,
-        errorMsg: "尚未連線至伺服器",
-      );
+      return HttpAPIResponse.error("尚未連線至伺服器");
     }
 
     try{
@@ -239,74 +238,46 @@ class SmartWaterAPI{
         statusCode: result.statusCode,
       );
     } on ArgumentError catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "無法連線至伺服器",
-        statusCode: result.statusCode,
-      );
+      return HttpAPIResponse.error("無法連線至伺服器");
     } on TimeoutException catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "伺服器連線逾時",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("伺服器連線逾時");
     }
   }
 
   Future<HttpAPIResponse<bool?>> getVavleState() async {
     final uri = Uri.tryParse("http://$_addr/waterValve");
     if (uri==null || _addr == null || _state.value != ConnectionStatus.successful) {
-      return HttpAPIResponse(
-        value: null,
-        statusCode: 0,
-        errorMsg: "在連線到伺服器前，您無法變更部分項目",
-      );
+      return HttpAPIResponse.error("在連線到伺服器前，您無法變更部分項目");
     }
 
     try{
       final result = await http.get(uri)
         .timeout(const Duration(seconds: 5));
-        print(result.body);
+        // print(result.body);
       return HttpAPIResponse(
         statusCode: result.statusCode,
         value: jsonDecode(result.body)["status"],
       );
       
     } on ArgumentError catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        statusCode: 100,
-        errorMsg: "無法連線至伺服器",
-      );
+      return HttpAPIResponse.error("無法連線至伺服器");
     } on TimeoutException catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "伺服器連線逾時",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("伺服器連線逾時");
     }
   }
 
-  Future<HttpAPIResponse<bool>> setVavleState(bool value) async {
+  Future<HttpAPIResponse<bool?>> setVavleState(bool value) async {
     final payload = jsonEncode({"status": value});
     final uri = Uri.tryParse("http://$_addr/waterValve");
 
     if (uri == null || _addr == null || _state.value != ConnectionStatus.successful) {
-      return HttpAPIResponse(
-        value: false,
-        statusCode: 0,
-        errorMsg: "無法設定水閥狀態，尚未連線至伺服器",
-      );
+      return HttpAPIResponse.error("無法設定水閥狀態，尚未連線至伺服器");
     }
 
     try{
       final result = await http.put(uri, body: payload);
       if (result.body.isNotEmpty) {
-        return HttpAPIResponse(
-          value: !value,
-          statusCode: 100,
-          errorMsg: "API炸了, YFHD 的 Skill issue",
-        );
+        return HttpAPIResponse.error("API炸了, YFHD 的 Skill issue");
       }
 
       return HttpAPIResponse(
@@ -315,21 +286,13 @@ class SmartWaterAPI{
       );
 
     } on ArgumentError catch (_) {
-      return HttpAPIResponse(
-        value: !value,
-        statusCode: 100,
-        errorMsg: "尚未連線至伺服器",
-      );
+      return HttpAPIResponse.error("尚未連線至伺服器");
     } on TimeoutException catch (_) {
-      return HttpAPIResponse(
-        value: false,
-        errorMsg: "伺服器連線逾時",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("伺服器連線逾時");
     }
   }
 
-  Future<HttpAPIResponse<Response?>> setTarget({
+  Future<HttpAPIResponse<Response?>> setLimit({
     int? daily,
     int? monthly
   }) async {
@@ -337,11 +300,7 @@ class SmartWaterAPI{
     final payload = jsonEncode({"daily_limit": daily});
 
     if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
-      return HttpAPIResponse(
-        statusCode: 100,
-        value: Response("", 100),
-        errorMsg: "尚未連線至伺服器",
-      );
+      return HttpAPIResponse.error("尚未連線至伺服器");
     }
 
     try{
@@ -352,35 +311,22 @@ class SmartWaterAPI{
         statusCode: result.statusCode,
       );
     } on ArgumentError catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "無法連線至伺服器",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("無法連線至伺服器");
     } on TimeoutException catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "伺服器連線逾時",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("伺服器連線逾時");
     }
   }
 
-  Future<HttpAPIResponse<(int, int)?>> getTarget() async {
+  Future<HttpAPIResponse<(int, int)?>> getLimit() async {
     final uri = Uri.tryParse("http://$_addr/waterLimit");
 
     if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
-      return HttpAPIResponse(
-        value: (0,0),
-        statusCode: 100,
-        errorMsg: "在連線到伺服器前，您無法變更部分項目",
-      );
+      return HttpAPIResponse.error("在連線到伺服器前，您無法變更部分項目");
     }
 
     try{
       final result = await http.get(uri)
         .timeout(const Duration(seconds: 5));
-      print(result.body);
 
       final dictResp = jsonDecode(result.body);
       return HttpAPIResponse(
@@ -388,19 +334,83 @@ class SmartWaterAPI{
         statusCode: result.statusCode,
       );
     } on ArgumentError catch (_) {
-      print("ERROR");
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "無法連線至伺服器",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("無法連線至伺服器");
     } on TimeoutException catch (_) {
-      return HttpAPIResponse(
-        value: null,
-        errorMsg: "伺服器連線逾時",
-        statusCode: 100,
-      );
+      return HttpAPIResponse.error("伺服器連線逾時");
     }
+  }
+
+  Future<HttpAPIResponse<double?>> getTarget() async {
+    final uri = Uri.tryParse("http://$_addr/waterDistTarget");
+
+    if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse.error("在連線到伺服器前，您無法變更部分項目");
+    }
+
+    try{
+      final result = await http.get(uri)
+        .timeout(const Duration(seconds: 5));
+
+      final dictResp = jsonDecode(result.body);
+      dictResp["target"] = (dictResp["target"] == -1) ? 0.0 : dictResp["target"]; // ERr0R HaNdLiNg 
+      return HttpAPIResponse(
+        value: dictResp["target"],
+        statusCode: result.statusCode,
+      );
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse.error("無法連線至伺服器");
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse.error("伺服器連線逾時");
+    }
+  } 
+
+  Future<HttpAPIResponse<Response?>> setTarget({required double target}) async {
+    final uri = Uri.tryParse("http://$_addr/waterDistTarget");
+    final payload = jsonEncode({"target": target});
+
+    if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
+      return HttpAPIResponse.error("尚未連線至伺服器");
+    }
+
+    try{
+      final result = await http.put(uri, body: payload)
+        .timeout(const Duration(seconds: 5));
+      return HttpAPIResponse(
+        value: result,
+        statusCode: result.statusCode,
+      );
+    } on ArgumentError catch (_) {
+      return HttpAPIResponse.error("無法連線至伺服器");
+    } on TimeoutException catch (_) {
+      return HttpAPIResponse.error("伺服器連線逾時");
+    }
+  }
+
+  // Article API
+  static const String host = "https://smart-water-utilities-project.github.io/smart_water_page/article/";
+
+  Future<List<ArticleCover>> listArticle() async {
+    final uri = Uri.parse("$host/main.json");
+    final response = jsonDecode((await http.get(uri)).body);
+
+    if (response["articles"] == null) return [];
+    final article = response["articles"] as List<dynamic>;
+
+    return article.map((map) => 
+      ArticleCover(
+        title: map["title"],
+        lore: map["lore"],
+        coverUrl: map["cover_url"],
+        articleId: map["id"]
+      )
+    ).toList();
+  }
+
+  Future<JsonWidgetData> getArticle(String id) async {
+    final uri = Uri.parse("$host/$id");
+    final response = jsonDecode((await http.get(uri)).body);
+    return JsonWidgetData.fromDynamic(response);
+
   }
 
 }
@@ -415,4 +425,15 @@ class HttpAPIResponse<T> {
   final String? errorMsg;
   final int statusCode;
   T value;
+
+  static HttpAPIResponse<Null> error(String message) => HttpAPIResponse(
+    value: null,
+    statusCode: 100,
+    errorMsg: message
+  );
+
+  static HttpAPIResponse<Response> fromResponse(Response response) => HttpAPIResponse(
+    value: response,
+    statusCode: response.statusCode,
+  );
 }

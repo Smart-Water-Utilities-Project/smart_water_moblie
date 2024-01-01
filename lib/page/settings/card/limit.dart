@@ -24,7 +24,7 @@ class _LimitSectionState extends State<LimitSection> {
   final pageController = PageController(initialPage: 0); 
   
   void updateFromServer() async {
-    final response = await SmartWaterAPI.instance.getTarget();
+    final response = await SmartWaterAPI.instance.getLimit();
     if(!mounted) return;
     if (response.errorMsg != null) {
       dailyValue = 0;
@@ -104,13 +104,13 @@ class _LimitSectionState extends State<LimitSection> {
                   errorMsg: errorMsg,
                   sliderValue: dailyValue,
                   onChanged: (value) => setState(() => dailyValue = value),
-                  onChangeEnd: (value) => SmartWaterAPI.instance.setTarget(daily: (value*100).ceil())
+                  onChangeEnd: (value) => SmartWaterAPI.instance.setLimit(daily: (value*100).ceil())
                 ),
                 TargetIndicator(
                   errorMsg: errorMsg,
                   sliderValue: monthlyValue,
                   onChanged: (value) => setState(() => monthlyValue = value),
-                  onChangeEnd: (value) => SmartWaterAPI.instance.setTarget(monthly: (value*100).ceil())
+                  onChangeEnd: (value) => SmartWaterAPI.instance.setLimit(monthly: (value*100).ceil())
                 )
               ]
             ),

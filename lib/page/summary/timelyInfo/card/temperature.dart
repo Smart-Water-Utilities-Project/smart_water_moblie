@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:smart_water_moblie/main.dart';
 
-import 'package:smart_water_moblie/core/counter.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/indicator.dart';
 import 'package:smart_water_moblie/page/settings/card/temperature.dart';
@@ -42,7 +42,7 @@ class _TemperatureCardState extends State<TemperatureCard> {
         widget: Expanded(
           child: ColumnIndicator(
             unit: "攝氏度",
-            listenable: Controller.temp,
+            value: timelyProvider.temp,
           )
         ),
         // onTap: () => launchDialog(
@@ -76,7 +76,7 @@ class CurrentFlowState extends State<CurrentFlow> {
 
   void flowListener() {
     // Convert value from L/Hr to ml/sec 
-    currentFlow = Controller.flow.value*1000/3600;
+    currentFlow = timelyProvider.flow*1000/3600;
   }
 
   void onUpdate(Timer timer) {
@@ -87,14 +87,14 @@ class CurrentFlowState extends State<CurrentFlow> {
   @override
   void initState() {
     super.initState();
-    Controller.flow.addListener(flowListener);
+    // propertyProvider.addListener(flowListener); ERROE HERE
     updateTimer = Timer.periodic(const Duration(milliseconds: 750), onUpdate);
   }
 
   @override
   void dispose() {
     super.dispose();
-    Controller.flow.removeListener(flowListener);
+    // propertyProvider.removeListener(flowListener); ERROR HERE
   }
 
   void addVolume(double value) async {
