@@ -54,7 +54,7 @@ class _UsageCardState extends State<UsageCard> {
               )
             ),
             widget: RowIndicator(
-              unit: "公升",
+              unit: "公升 (日)",
               value: timelyProvider.dayUsage,
               fractionDigits: 1,
             ),

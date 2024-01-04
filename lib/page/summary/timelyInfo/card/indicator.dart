@@ -31,7 +31,8 @@ class RowIndicator extends StatelessWidget {
           " $unit",
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.grey
+            color: Colors.grey,
+            overflow: TextOverflow.ellipsis
           )
         )
       ]

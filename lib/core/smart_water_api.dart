@@ -228,7 +228,7 @@ class SmartWaterAPI{
     try{
       final result = await http.get(uri)
         .timeout(const Duration(seconds: 5));
-      debugPrint(result.body);
+      // debugPrint(result.body);
       return HttpAPIResponse(
         value: jsonDecode(result.body),
         statusCode: result.statusCode,
@@ -288,12 +288,9 @@ class SmartWaterAPI{
     }
   }
 
-  Future<HttpAPIResponse<Response?>> setLimit({
-    int? daily,
-    int? monthly
-  }) async {
+  Future<HttpAPIResponse<Response?>> setLimit({int? daily, monthly}) async {
     final uri = Uri.tryParse("http://$_addr/waterLimit");
-    final payload = jsonEncode({"daily_limit": daily});
+    final payload = jsonEncode({"daily_limit": daily, "monthly_limit": monthly});
 
     if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
       return HttpAPIResponse.error("尚未連線至伺服器");
@@ -325,8 +322,9 @@ class SmartWaterAPI{
         .timeout(const Duration(seconds: 5));
 
       final dictResp = jsonDecode(result.body);
+      print(dictResp);
       return HttpAPIResponse(
-        value: (dictResp["daily_limit"], dictResp["daily_limit"]),
+        value: (dictResp["daily_limit"], dictResp["monthly_limit"]),
         statusCode: result.statusCode,
       );
     } on ArgumentError catch (_) {

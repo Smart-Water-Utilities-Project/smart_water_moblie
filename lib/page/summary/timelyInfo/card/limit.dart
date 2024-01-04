@@ -66,6 +66,7 @@ class _LimitCardState extends State<LimitCard> {
               ),
               const Spacer(),
               Container(
+                width: 100,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 5
@@ -76,12 +77,14 @@ class _LimitCardState extends State<LimitCard> {
                 ),
                 child: AnimatedFlipCounter(
                   value: (timelyProvider.monthLimit == 0) ? 0 :
-                    timelyProvider.monthUsage / timelyProvider.monthLimit / 100,
+                    timelyProvider.monthUsage / timelyProvider.monthLimit / 10,
                   suffix: "%",
                   fractionDigits: 1,
                   curve: Curves.easeInOutSine,
                   duration: const Duration(milliseconds: 600),
-                  textStyle: themeData.textTheme.titleMedium
+                  textStyle: themeData.textTheme.titleMedium?.copyWith(
+                    overflow: TextOverflow.ellipsis
+                  )
                 )
               )
             ]

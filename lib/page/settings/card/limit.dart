@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:smart_water_moblie/core/firebase_msg.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
@@ -42,6 +43,7 @@ class _LimitSectionState extends State<LimitSection> {
 
     // print(response.value);
     dailyValue = response.value!.$1 / 100;
+    monthlyValue = response.value!.$2 / 100;
     setState(() {});
   }
 
@@ -50,6 +52,9 @@ class _LimitSectionState extends State<LimitSection> {
     super.initState();
     updateFromServer();
     SmartWaterAPI.instance.state.addListener(updateFromServer);
+    SharedPreferences.getInstance().then((value) => setState(() {
+      enableNotifty = value.getBool("setLimitNotify")??false;
+    }));
   }
 
   @override
@@ -126,7 +131,9 @@ class _LimitSectionState extends State<LimitSection> {
             title: "啟用目標通知",
             isEnable: enableNotifty,
             lore: "當用水量接近設定的目標時發送通知",
-            onChange: (value) {
+            onChange: (value) async {
+              final instance = await SharedPreferences.getInstance();
+              await instance.setBool("setLimitNotify", value);
               FireBaseAPI.instance.toggleWaterLimitNotify(value)
                 .onError((error, stackTrace) => debugPrint("setLimitNotify ERROR"));
               setState(() => enableNotifty = value);
