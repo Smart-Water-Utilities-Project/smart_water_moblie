@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:smart_water_moblie/page/volume/page_view.dart';
 import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
-class WaterValuePage extends StatefulWidget {
-  const WaterValuePage({super.key});
+class WaterFlowPage extends StatefulWidget {
+  const WaterFlowPage({super.key});
 
   @override
-  State<WaterValuePage> createState() => _WaterValuePageState();
+  State<WaterFlowPage> createState() => _WaterFlowPageState();
 }
 
-class _WaterValuePageState extends State<WaterValuePage> {
+class _WaterFlowPageState extends State<WaterFlowPage> {
 
   PageController pageController = PageController();
   List<GlobalKey<ModePageViewState>> indexKeys = [
@@ -23,8 +23,8 @@ class _WaterValuePageState extends State<WaterValuePage> {
   void onSwitchChange(ShowType event) {
     pageController.animateToPage(
       event.index,
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeInOutSine
+      curve: Curves.easeInOutSine,
+      duration: const Duration(milliseconds: 350)
     );
     setState(() {});
   }
@@ -32,6 +32,7 @@ class _WaterValuePageState extends State<WaterValuePage> {
   void onDoubleClick(ShowType event) {
     indexKeys[event.index].currentState?.resetPage();
   }
+
   @override
   void initState() {
     super.initState();
@@ -40,10 +41,8 @@ class _WaterValuePageState extends State<WaterValuePage> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
     final themeData = Theme.of(context);
-    // final barsSpace = 4.0 * mediaQuery.size.width / 400;
-    // final barsWidth = 8.0 * mediaQuery.size.width / 400;
+    final mediaQuery = MediaQuery.of(context);
   
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -98,7 +97,7 @@ class _WaterValuePageState extends State<WaterValuePage> {
                 )
               )
             ]
-          ),
+          )
           // const BottomDetailSheet()
         ]
       )

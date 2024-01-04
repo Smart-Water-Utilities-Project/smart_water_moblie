@@ -111,8 +111,9 @@ class LeakageSectionState extends State<LeakageSection> with AutomaticKeepAliveC
             title: "開關水閥",
             isEnable: isVavleOpen??false,
             lore: (isVavleOpen==null) ? "與伺服器索取資料時發生錯誤" : "即時控制水塔總水閥的開關",
-            onChange: (isVavleOpen == null) ? null : (value) {
-              SmartWaterAPI.instance.setVavleState(value).then(processResp);
+            onChange: (isVavleOpen == null) ? null : (value) async {
+              final response = await SmartWaterAPI.instance.setVavleState(value);
+              processResp(response);
             }
           ),
           const SizedBox(height: 10)

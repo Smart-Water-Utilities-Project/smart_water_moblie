@@ -16,6 +16,9 @@ class _TargetCardState extends State<TargetCard> {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
+
+    final percent = (timelyProvider.maxHeight - timelyProvider.level) / timelyProvider.maxHeight;
+    final volume = (timelyProvider.maxHeight - timelyProvider.level) * timelyProvider.bottomArea;
     
     return ListenableBuilder(
       listenable: timelyProvider,
@@ -39,7 +42,7 @@ class _TargetCardState extends State<TargetCard> {
               children: [
                 AnimatedFlipCounter(
                   fractionDigits: 1,
-                  value: (timelyProvider.maxHeight - timelyProvider.level) * timelyProvider.bottomArea,
+                  value: (volume < 0) ? 0 : volume,
                   curve: Curves.easeInOutSine,
                   duration: const Duration(milliseconds: 600),
                   textStyle: themeData.textTheme.titleLarge
@@ -62,7 +65,7 @@ class _TargetCardState extends State<TargetCard> {
                   width: 100,
                   height: 100,
                   child: WaterBottle(
-                    value: (timelyProvider.maxHeight - timelyProvider.level) / timelyProvider.maxHeight
+                    value: (percent < 0) ? 0 : percent
                   )
                 )
               ]

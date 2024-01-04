@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:async/async.dart';
 import 'package:http/http.dart';
+import 'package:async/async.dart';
+import 'package:http/http.dart' as http;
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:smart_water_moblie/core/extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +41,7 @@ class SmartWaterAPI{
   bool get verify => _verify;
   ValueNotifier<ConnectionStatus> get state => _state;
 
+  static const String _articleEndPoints = "https://smart-water-utilities-project.github.io/smart_water_page/article/";
   static final chartDataReciever = StreamController<List<dynamic>>();
   final chartDataRecieveStream = chartDataReciever.stream.asBroadcastStream();
 
@@ -124,13 +125,14 @@ class SmartWaterAPI{
   }
 
   void onData(dynamic event) {
-    if (event.runtimeType is String) {
-      final data = jsonDecode(event) as Map<String, dynamic>;
+    if (event.runtimeType == String) {
+      final data = jsonDecode(event);
       switch(data["op"]) { // Check op code
         case 0: onGeneral(data); break;
         case 1: onHello(data); break;
       }
     }
+    
   }
 
   void onHello(Map<String, dynamic> map) {
@@ -141,20 +143,18 @@ class SmartWaterAPI{
       return;
     }
     _id = data["id"];
-
     final returnData = {
       "op": 2,
       "d": {
         "dt": "mobile_app"
       }
     };
-
     client?.add(jsonEncode(returnData));
   }
 
   void onGeneral(Map<String, dynamic> map) {
-    switch(map["t"] as String) {
-      case "REQUEST_HISTORY_DATA_ACK": {
+    switch(map["t"] as String?) {
+      case "REQUEST_HISTORY_DATA_ACK": { // Departured
         chartDataReciever.sink.add(map["d"]);
       }
 
@@ -216,21 +216,21 @@ class SmartWaterAPI{
   }
 
   // HTTP protocol
-  Future<HttpAPIResponse<Response?>> getHistory((DateTime, DateTime) range) async {
+  Future<HttpAPIResponse<dynamic>> getHistory((DateTime, DateTime) range) async {
     final startTs = range.$1.toMinutesSinceEpoch().floor();
     final endTs = range.$2.toMinutesSinceEpoch().floor();
     final uri = Uri.tryParse("http://$_addr/history?start=$startTs&end=$endTs");
-    Response result = Response("[]", 100);
 
     if (uri==null || _addr==null || _state.value != ConnectionStatus.successful) {
       return HttpAPIResponse.error("尚未連線至伺服器");
     }
 
     try{
-      result = await http.get(uri)
+      final result = await http.get(uri)
         .timeout(const Duration(seconds: 5));
+      debugPrint(result.body);
       return HttpAPIResponse(
-        value: result,
+        value: jsonDecode(result.body),
         statusCode: result.statusCode,
       );
     } on ArgumentError catch (_) {
@@ -383,10 +383,8 @@ class SmartWaterAPI{
   }
 
   // Article API
-  static const String host = "https://smart-water-utilities-project.github.io/smart_water_page/article/";
-
   Future<List<ArticleCover>> listArticle() async {
-    final uri = Uri.parse("$host/main.json");
+    final uri = Uri.parse("$_articleEndPoints/main.json");
     final response = jsonDecode((await http.get(uri)).body);
 
     if (response["articles"] == null) return [];
@@ -394,21 +392,48 @@ class SmartWaterAPI{
 
     return article.map((map) => 
       ArticleCover(
-        title: map["title"],
         lore: map["lore"],
-        coverUrl: map["cover_url"],
-        articleId: map["id"]
+        title: map["title"],
+        articleId: map["id"],
+        coverUrl: map["cover_url"]
       )
     ).toList();
   }
 
   Future<JsonWidgetData> getArticle(String id) async {
-    final uri = Uri.parse("$host/$id");
+    final uri = Uri.parse("$_articleEndPoints/$id");
     final response = jsonDecode((await http.get(uri)).body);
     return JsonWidgetData.fromDynamic(response);
+  }
+}
 
+class Date {
+  static (DateTime, DateTime) reqDay({int daysOffset = 0}) {
+    final now = DateTime.now();
+
+    final startTime = DateTime(now.year, now.month, now.day-daysOffset);
+    final endTime = startTime.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
+
+    return (startTime, endTime);
   }
 
+  static (DateTime, DateTime) reqWeek({int weekOffset = 0}) {
+    final now = DateTime.now();
+
+    final startTime = now.subtract(Duration(days: now.weekday + weekOffset*7)).add(const Duration(days: 1));
+    final endTime = startTime.add(const Duration(days: 8)).subtract(const Duration(milliseconds: 1));
+    
+    return (startTime, endTime);
+  }
+
+  static (DateTime, DateTime) reqMonth({int monthOffset = 0}) {
+    final now = DateTime.now();
+
+    final startTime = DateTime(now.year, now.month-monthOffset, 1);
+    final endTime = DateTime(now.year, now.month-monthOffset+1, 1).subtract(const Duration(milliseconds: 1));
+
+    return (startTime, endTime);
+  }
 }
 
 class HttpAPIResponse<T> {
@@ -433,3 +458,4 @@ class HttpAPIResponse<T> {
     statusCode: response.statusCode,
   );
 }
+

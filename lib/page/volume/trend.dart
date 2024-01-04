@@ -22,7 +22,7 @@ class TrendIndicatorState extends State<TrendIndicator> {
   void refresh() async {
     setState(() => trend = null);
 
-    final waterflows = widget.sensorData.map((e) => e.waterflow).toList();
+    final waterflows = widget.sensorData.map((e) => e.wUsage / e.maxWUsage).toList();
     final halfRange = (widget.sensorData.length/2).ceil();
 
     if (widget.sensorData.isEmpty) {

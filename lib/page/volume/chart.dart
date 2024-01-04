@@ -133,7 +133,7 @@ class _WaterflowChartState extends State<WaterflowChart> {
         xValueMapper: (SensorDataPack data, _) {
           return SensorDataParser.displayLabel(data, widget.selectedMode);
         },
-        yValueMapper: (SensorDataPack data, _) => data.waterflow,
+        yValueMapper: (SensorDataPack data, _) => data.wUsage,
         pointColorMapper: (SensorDataPack data, _) => Colors.blue.shade800,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(4), 
@@ -176,7 +176,7 @@ class _OverAllTextState extends State<OverAllText> {
         return DateFormat('yyyy年 MM/dd').format(startTs ?? endTs!);
       
       case ShowType.week:
-        return "${DateFormat('yyyy年 MM/dd').format(startTs!)} - ${DateFormat('MM/dd').format(endTs!)}";
+        return "${DateFormat('yyyy年 MM/dd').format(startTs!)} - ${DateFormat('MM/dd').format(startTs.add(const Duration(days: 6)))}";
 
       case ShowType.month:
         final daysOfMonth = DateTime(startTs!.year, startTs.month+1, 0).day;

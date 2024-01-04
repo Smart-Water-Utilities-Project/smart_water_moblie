@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ThemeProvider extends ChangeNotifier {
   ThemeMode theme = ThemeMode.system;
   
-  Future<ThemeMode> fetch() async {
+  Future<ThemeMode> initialize() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int index = prefs.getInt('themeMode') ?? 0;
     theme = ThemeMode.values[index];

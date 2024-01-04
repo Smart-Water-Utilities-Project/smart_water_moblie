@@ -19,12 +19,12 @@ class SummaryPage extends StatefulWidget {
 class _SummaryPageState extends State<SummaryPage>{
   late StreamSubscription subscribe;
   
-
   void onData(Map<String, dynamic> value) {
+    print(value);
     timelyProvider.setTimely(
       temp: value["wt"]??0,
       flow: value["wf"]??0,
-      level: value["wl"]??0
+      level: value["wd"]??0
     );
     setState(() {});
   }

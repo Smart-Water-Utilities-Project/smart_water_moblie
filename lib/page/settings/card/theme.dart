@@ -30,7 +30,7 @@ class _ThemeSectionState extends State<ThemeSection> {
 
   void fetchTheme() async {
     provider = Provider.of<ThemeProvider>(context, listen: false);
-    currentTheme = await provider.fetch();
+    currentTheme = await provider.initialize();
     provider.addListener(providerSetState);
   }
   

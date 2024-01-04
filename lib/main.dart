@@ -17,7 +17,7 @@ TimelyProvider timelyProvider = TimelyProvider();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await demoMode.initialize();
-  await themeProvider.fetch();
+  await themeProvider.initialize();
   await timelyProvider.initialize();
   await NotificationAPI.instance.initizlize();
   await FireBaseAPI.instance.initNotification();

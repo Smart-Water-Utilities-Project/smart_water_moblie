@@ -36,9 +36,9 @@ class DemoMode {
       });
     } else {
       timelyProvider.setTimely(
-        summary: 0,
-        temp: 0,
-        flow: 0,
+        summary: 0.0,
+        temp: 0.0,
+        flow: 0.0,
         level: timelyProvider.maxHeight
       );
       timelyUpdateTimer?.cancel();

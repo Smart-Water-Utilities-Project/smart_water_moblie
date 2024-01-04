@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:smart_water_moblie/main.dart';
@@ -13,6 +15,23 @@ class UsageCard extends StatefulWidget {
 }
 
 class _UsageCardState extends State<UsageCard> {
+  Timer? updateTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (t) => timelyProvider.updateDayUsage()
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    updateTimer?.cancel();
+  }
+  
   @override
   Widget build(BuildContext context) {
     // final themeData = Theme.of(context);
@@ -36,7 +55,7 @@ class _UsageCardState extends State<UsageCard> {
             ),
             widget: RowIndicator(
               unit: "公升",
-              value: timelyProvider.summary,
+              value: timelyProvider.dayUsage,
               fractionDigits: 1,
             ),
             onTap: () => Navigator.of(context).push(

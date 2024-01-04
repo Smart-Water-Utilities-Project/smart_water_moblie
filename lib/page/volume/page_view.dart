@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:smart_water_moblie/core/smart_water_api.dart';
-import 'package:smart_water_moblie/core/data_parser.dart';
+
 import 'package:smart_water_moblie/core/demostrate.dart';
+import 'package:smart_water_moblie/core/data_parser.dart';
 import 'package:smart_water_moblie/page/volume/chart.dart';
-import 'package:smart_water_moblie/page/volume/mode_select.dart';
 import 'package:smart_water_moblie/page/volume/trend.dart';
+import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
 class ModePageView extends StatefulWidget {
   const ModePageView({
@@ -21,7 +19,7 @@ class ModePageView extends StatefulWidget {
   State<ModePageView> createState() => ModePageViewState();
 }
 
-class ModePageViewState extends State<ModePageView> {
+class ModePageViewState extends State<ModePageView> with AutomaticKeepAliveClientMixin{
   PageController pageController = PageController();
 
   void resetPage() {
@@ -30,81 +28,54 @@ class ModePageViewState extends State<ModePageView> {
     }
   }
 
-  (DateTime, DateTime) reqDay({int daysOffset = 0}) {
-    final now = DateTime.now();
-
-    final startTime = DateTime(now.year, now.month, now.day-daysOffset);
-    final endTime = startTime.add(const Duration(days: 1)).subtract(const Duration(milliseconds: 1));
-
-    return (startTime, endTime);
-  }
-
-  (DateTime, DateTime) reqWeek({int weekOffset = 0}) {
-    final now = DateTime.now();
-
-    final startTime = now.subtract(Duration(days: now.weekday + weekOffset*7)).add(const Duration(days: 1));
-    final endTime = startTime.add(const Duration(days: 8)).subtract(const Duration(milliseconds: 1));
-    
-    return (startTime, endTime);
-  }
-
-  (DateTime, DateTime) reqMonth({int monthOffset = 0}) {
-    final now = DateTime.now();
-
-    final startTime = DateTime(now.year, now.month-monthOffset, 1);
-    final endTime = DateTime(now.year, now.month-monthOffset+1, 1).subtract(const Duration(milliseconds: 1));
-
-    return (startTime, endTime);
-  }
-
-  (DateTime, DateTime) getTimeRange({int offset=0}) {
-    switch (widget.showType) {
-      case ShowType.day: return reqDay(daysOffset: offset);
-      case ShowType.week: return reqWeek(weekOffset: offset);
-      case ShowType.month: return reqMonth(monthOffset: offset);
-    }
-  }
-
-  Future<Response> fetchData((DateTime, DateTime) range) async {
-
+  Future<List<dynamic>> fetchData((DateTime, DateTime) range) async {
     final passData = demoMode.chartDemo(timeSet: range);
 
     if (passData != null) {
-      return Response(jsonEncode(passData), 200);
+      return passData;
     } else { 
       final response = await SmartWaterAPI.instance.getHistory(range);
       return response.value!;
     }
   }
 
-  (List<SensorDataPack>?, SensorHeadData?) getData(body, (DateTime, DateTime) range) {
-    final event = jsonDecode(body);
+  (List<SensorDataPack>?, SensorHeadData?) getData(List<dynamic> map, (DateTime, DateTime) range) {
     
     switch(widget.showType) {
       case ShowType.day: 
-        return SensorDataParser.day(event, range);
+        return SensorDataParser.day(map, range);
       case ShowType.week: 
-        return SensorDataParser.week(event, range);
+        return SensorDataParser.week(map, range);
       case ShowType.month:
-        return SensorDataParser.month(event, range);
+        return SensorDataParser.month(map, range);
+    }
+  }
+
+  (DateTime, DateTime) getTimeRange({int offset=0}) {
+    switch (widget.showType) {
+      case ShowType.day: return Date.reqDay(daysOffset: offset);
+      case ShowType.week: return Date.reqWeek(weekOffset: offset);
+      case ShowType.month: return Date.reqMonth(monthOffset: offset);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return PageView.builder(
       reverse: true,
       controller: pageController,
       itemBuilder: (context, index) {
         final range = getTimeRange(offset: index);
-        final Future<Response> req = fetchData(range);
+        final req = fetchData(range);
         return FutureBuilder(
           future: req, 
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              final data = getData(snapshot.data!.body, range);
+              final data = getData(snapshot.data??[], range);
 
               return WaterflowPageView(
+                key: const ValueKey<int>(1),
                 showType: widget.showType,
                 timestamps: range, 
                 data: data.$1!,
@@ -114,9 +85,10 @@ class ModePageViewState extends State<ModePageView> {
             
             return Center(
               child: WaterflowPageView(
-                showType: widget.showType,
-                timestamps: range, 
+                key: const ValueKey<int>(0),
                 data: const [],
+                timestamps: range, 
+                showType: widget.showType,
                 heading: SensorHeadData.none()
               )
             );
@@ -125,6 +97,9 @@ class ModePageViewState extends State<ModePageView> {
       }
     );
   }
+  
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class WaterflowPageView extends StatefulWidget {

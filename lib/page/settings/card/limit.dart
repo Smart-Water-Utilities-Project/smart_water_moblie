@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:smart_water_moblie/core/firebase_msg.dart';
 import 'package:smart_water_moblie/core/smart_water_api.dart';
+import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/settings/basic.dart';
 
 enum TargetType {
@@ -104,13 +105,19 @@ class _LimitSectionState extends State<LimitSection> {
                   errorMsg: errorMsg,
                   sliderValue: dailyValue,
                   onChanged: (value) => setState(() => dailyValue = value),
-                  onChangeEnd: (value) => SmartWaterAPI.instance.setLimit(daily: (value*100).ceil())
+                  onChangeEnd: (value) async {
+                    await SmartWaterAPI.instance.setLimit(daily: (value*100).ceil());
+                    timelyProvider.setTimely(dayLimit: (value*100).ceil());
+                  }
                 ),
                 TargetIndicator(
                   errorMsg: errorMsg,
                   sliderValue: monthlyValue,
                   onChanged: (value) => setState(() => monthlyValue = value),
-                  onChangeEnd: (value) => SmartWaterAPI.instance.setLimit(monthly: (value*100).ceil())
+                  onChangeEnd: (value) async {
+                    await SmartWaterAPI.instance.setLimit(monthly: (value*100).ceil());
+                    timelyProvider.setTimely(monthLimit: (value*100).ceil());
+                  }
                 )
               ]
             ),
