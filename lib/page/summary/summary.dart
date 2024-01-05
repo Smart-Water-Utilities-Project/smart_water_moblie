@@ -8,7 +8,6 @@ import 'package:smart_water_moblie/page/summary/article/article.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/timely_info.dart';
 import 'package:smart_water_moblie/page/settings/settings.dart';
 
-
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});
 
@@ -16,16 +15,15 @@ class SummaryPage extends StatefulWidget {
   State<SummaryPage> createState() => _SummaryPageState();
 }
 
-class _SummaryPageState extends State<SummaryPage>{
+class _SummaryPageState extends State<SummaryPage> {
   late StreamSubscription subscribe;
-  
+
   void onData(Map<String, dynamic> value) {
     print(value);
     timelyProvider.setTimely(
-      temp: value["wt"]??0,
-      flow: value["wf"]??0,
-      level: value["wd"]??0
-    );
+        temp: value["wt"] ?? 0,
+        flow: value["wf"] ?? 0,
+        level: value["wd"] ?? 0);
     setState(() {});
   }
 
@@ -45,46 +43,36 @@ class _SummaryPageState extends State<SummaryPage>{
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
-    
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        excludeHeaderSemantics: true,
-        surfaceTintColor: themeData.colorScheme.background,
-        backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
-        title: const TitleBar(),
-        flexibleSpace: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-            child: Container(color: Colors.transparent)
-          )
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          elevation: 0,
+          centerTitle: true,
+          excludeHeaderSemantics: true,
+          surfaceTintColor: themeData.colorScheme.background,
+          backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
+          title: const TitleBar(),
+          flexibleSpace: ClipRect(
+              child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+                  child: Container(color: Colors.transparent))),
         ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    SizedBox(height: 55 + mediaQuery.viewPadding.top),
-                    const TimelyInfo(),
-                    const SizedBox(height: 10),
-                    const Article(),
-                    const SizedBox(height: 10)
-                  ]
-                )
-              )
-            ]
-          )
-        )
-      )
-    );
+        body: Center(
+            child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                          child: ListView(padding: EdgeInsets.zero, children: [
+                        SizedBox(height: 55 + mediaQuery.viewPadding.top),
+                        const TimelyInfo(),
+                        const SizedBox(height: 10),
+                        const Article(),
+                        const SizedBox(height: 10)
+                      ]))
+                    ]))));
   }
 }
 
@@ -111,16 +99,13 @@ class TitleBar extends StatelessWidget {
         Text('智慧用水', style: themeData.textTheme.titleLarge),
         const Spacer(),
         IconButton(
-          icon: const Icon(Icons.settings, size: 35),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SettingsPage()
-              ),
-            );
-          } 
-        )
+            icon: const Icon(Icons.settings, size: 35),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            })
       ],
     );
   }
