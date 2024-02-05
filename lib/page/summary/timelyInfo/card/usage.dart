@@ -22,7 +22,7 @@ class _UsageCardState extends State<UsageCard> {
     super.initState();
     updateTimer = Timer.periodic(
       const Duration(seconds: 10),
-      (t) => timelyProvider.updateDayUsage()
+      (t) => timelyProvider.updateTimelyUsage()
     );
   }
 
@@ -32,6 +32,9 @@ class _UsageCardState extends State<UsageCard> {
     updateTimer?.cancel();
   }
   
+  double getPrettyValue(double val) => (val >= 1000) ? val / 1000 : val;
+  String getPrettyUnit(double val) => (val >= 1000) ? "度" : "公升";
+
   @override
   Widget build(BuildContext context) {
     // final themeData = Theme.of(context);
@@ -54,8 +57,8 @@ class _UsageCardState extends State<UsageCard> {
               )
             ),
             widget: RowIndicator(
-              unit: "公升 (日)",
-              value: timelyProvider.dayUsage,
+              unit: "${getPrettyUnit(timelyProvider.dayUsage)} (日)",
+              value: getPrettyValue(timelyProvider.dayUsage),
               fractionDigits: 1,
             ),
             onTap: () => Navigator.of(context).push(

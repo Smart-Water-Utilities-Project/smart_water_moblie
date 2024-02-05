@@ -249,7 +249,7 @@ class TextBox extends StatelessWidget {
   const TextBox({
     super.key,
     required this.title,
-    required this.controller,
+    this.controller,
     this.onChanged,
     this.onlyDigits = false,
     this.onlyDouble = false,
@@ -258,11 +258,11 @@ class TextBox extends StatelessWidget {
   });
 
   final String title;
-  final bool onlyDigits, onlyDouble;
   final bool? autofocus;
   final String? suffixString;
-  final TextEditingController controller;
+  final bool onlyDigits, onlyDouble;
   final Function(String)? onChanged;
+  final TextEditingController? controller;
 
   List<TextInputFormatter>? getInputFormat() {
     if (onlyDouble) {

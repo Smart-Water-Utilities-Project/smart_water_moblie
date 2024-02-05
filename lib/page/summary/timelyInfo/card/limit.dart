@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:animated_flip_counter/animated_flip_counter.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_water_moblie/core/data_parser.dart';
-import 'package:smart_water_moblie/core/smart_water_api.dart';
 
 import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/summary/timelyInfo/card/basic.dart';
@@ -23,23 +20,20 @@ class _LimitCardState extends State<LimitCard> {
   @override
   void initState() {
     super.initState();
-    updateTimer = Timer.periodic(
-      const Duration(seconds: 10),
-      (t) => timelyProvider.updateMonthUsage()
-    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    updateTimer?.cancel();
   }
+
+  double getPrettyValue(double val) => (val >= 1000) ? val / 1000 : val;
+  String getPrettyUnit(double val) => (val >= 1000) ? "度" : "公升";
 
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
-    
     return ListenableBuilder(
       listenable: timelyProvider,
       builder: (context, child) => InfoCard(
@@ -60,9 +54,9 @@ class _LimitCardState extends State<LimitCard> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               RowIndicator(
-                unit: " 公升 (月)",
+                unit: " ${getPrettyUnit(timelyProvider.monthUsage)} (月)",
                 fractionDigits: 1,
-                value: timelyProvider.monthUsage
+                value: getPrettyValue(timelyProvider.monthUsage)
               ),
               const Spacer(),
               Container(

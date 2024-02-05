@@ -35,8 +35,7 @@ class _TargetCardState extends State<TargetCard> {
     final fullHeight = timelyProvider.maxHeight - timelyProvider.offsetHeight;
 
     final percent =
-        ((fullHeight - (timelyProvider.level - timelyProvider.offsetHeight)) /
-            fullHeight);
+        ((fullHeight - (timelyProvider.level - timelyProvider.offsetHeight)) / fullHeight);
     final volume =
         (fullHeight - (timelyProvider.level - timelyProvider.offsetHeight)) *
             timelyProvider.bottomArea;

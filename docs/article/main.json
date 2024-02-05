@@ -1,0 +1,17 @@
+{
+  "article_count": 1,
+  "articles": [
+    {
+      "title": "省水妙招",
+      "lore": "每天省一點，能帶來不一樣的改變",
+      "cover_url": "https://www-ws.wra.gov.tw/001/Upload/401/relpic/9029/7241/3ccad84a-cd88-4eb6-9e17-5b3cfc38fce0.png",
+      "id": "01.json"
+    },
+    {
+      "title": "震驚世界一百年",
+      "lore": "如何節省人類最需要的東西",
+      "cover_url": "https://truth.bahamut.com.tw/s01/201602/385ca0c7e23cb2ab2bf2a42687cc49b6.JPG",
+      "id": "02.json"
+    }
+  ]
+}

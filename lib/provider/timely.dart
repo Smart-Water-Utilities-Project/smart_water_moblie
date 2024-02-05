@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_water_moblie/core/data_parser.dart';
@@ -14,7 +16,7 @@ class TimelyProvider with ChangeNotifier {
       _dayUsage = 0,
       _monthUsage = 0;
 
-  int _dayLimit = 1, _monthLimit = 1;
+  int _dayLimit = 0, _monthLimit = 0;
 
   double get flow => _flow;
   double get temp => _temp;
@@ -48,6 +50,7 @@ class TimelyProvider with ChangeNotifier {
     _dayLimit = dayLimit ?? _dayLimit;
     _monthLimit = monthLimit ?? _monthLimit;
 
+    updateTimelyUsage();
     notifyListeners();
   }
 
@@ -70,6 +73,24 @@ class TimelyProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateTimelyUsage() async {
+    final response = await SmartWaterAPI.instance.getHistory(Date.reqMonth());
+    final dayRange = Date.reqDay();
+    
+    if(response.value == null) return;
+    final monthRaw = response.value;
+    final dayRaw = (response.value as List<dynamic>).where((index) {
+      final ts = DateTime.fromMillisecondsSinceEpoch((index["t"] as int) * 60 * 1000);
+      return ts.isAfter(dayRange.$1) && ts.isBefore(dayRange.$2);
+    }).toList();
+
+    _monthUsage = SensorDataParser.day(monthRaw, Date.reqDay()).$2?.sumWf ?? 0;
+    _dayUsage = SensorDataParser.day(dayRaw, Date.reqDay()).$2?.sumWf ?? 0;
+
+    notifyListeners();
+  }
+
+  /*
   Future<void> updateDayUsage() async {
     final response = await SmartWaterAPI.instance.getHistory(Date.reqDay());
     if (response.errorMsg != null) {
@@ -97,4 +118,5 @@ class TimelyProvider with ChangeNotifier {
 
     // _dayUsage = response.value;
   }
+  */
 }

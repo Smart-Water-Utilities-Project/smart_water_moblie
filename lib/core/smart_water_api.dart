@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:smart_water_moblie/core/extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_water_moblie/main.dart';
 import 'package:smart_water_moblie/page/summary/article/article.dart';
 
 enum ConnectionStatus {
@@ -41,7 +42,7 @@ class SmartWaterAPI{
   bool get verify => _verify;
   ValueNotifier<ConnectionStatus> get state => _state;
 
-  static const String _articleEndPoints = "https://smart-water-utilities-project.github.io/smart_water_page/article/";
+  static const String _articleEndPoints = "https://smart-water-utilities-project.github.io/smart_water_moblie/article/";
   static final chartDataReciever = StreamController<List<dynamic>>();
   final chartDataRecieveStream = chartDataReciever.stream.asBroadcastStream();
 
@@ -212,6 +213,12 @@ class SmartWaterAPI{
     }
 
     _state.value = ConnectionStatus.successful;
+
+    final limit = await getLimit();
+    timelyProvider.setTimely(
+      dayLimit: limit.value?.$1??0,
+      monthLimit: limit.value?.$2??0
+    );
     return;
   }
 
@@ -372,7 +379,7 @@ class SmartWaterAPI{
       return HttpAPIResponse(
         value: result,
         statusCode: result.statusCode,
-      );
+      ); 
     } on ArgumentError catch (_) {
       return HttpAPIResponse.error("無法連線至伺服器");
     } on TimeoutException catch (_) {

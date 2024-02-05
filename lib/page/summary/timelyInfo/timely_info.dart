@@ -20,7 +20,7 @@ class TimelyInfo extends StatefulWidget {
 class _TimelyInfoState extends State<TimelyInfo> {
   Timer? timer;
 
-  void updateUsage () async => await timelyProvider.updateDayUsage();
+  // void updateUsage () async => await timelyProvider.updateDayUsage();
 
   /*@override
   void initState() {

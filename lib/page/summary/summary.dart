@@ -54,9 +54,9 @@ class _SummaryPageState extends State<SummaryPage> {
           backgroundColor: themeData.colorScheme.background.withOpacity(0.75),
           title: const TitleBar(),
           flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
-                  child: Container(color: Colors.transparent))),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+              child: Container(color: Colors.transparent))),
         ),
         body: Center(
             child: Padding(
@@ -99,13 +99,13 @@ class TitleBar extends StatelessWidget {
         Text('智慧用水', style: themeData.textTheme.titleLarge),
         const Spacer(),
         IconButton(
-            icon: const Icon(Icons.settings, size: 35),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            })
+          icon: const Icon(Icons.settings, size: 35),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsPage()),
+            );}
+        )
       ],
     );
   }
