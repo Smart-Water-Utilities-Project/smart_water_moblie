@@ -5,6 +5,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:smart_water_moblie/core/data_parser.dart';
 import 'package:smart_water_moblie/page/volume/mode_select.dart';
 
+/* 
+  Shout out to yuva for chart styling in this post: 
+  https://stackoverflow.com/questions/74638400/how-to-make-custom-tooltip-in-sfcartesianchart
+*/
+
 class WaterflowChart extends StatefulWidget {
   const WaterflowChart({
     super.key,

@@ -36,10 +36,10 @@ class DemoMode {
       });
     } else {
       timelyProvider.setTimely(
-          summary: 0.0,
-          temp: 0.0,
-          flow: 0.0,
-          level: timelyProvider.offsetHeight);
+        summary: 0.0,
+        temp: 0.0,
+        flow: 0.0,
+        level: timelyProvider.offsetHeight);
       timelyUpdateTimer?.cancel();
     }
   }
